@@ -1132,7 +1132,7 @@ export const policyRepository = {
       memberDocs: documents.memberDocs?.length || 0
     });
     
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Link policy documents
       if (documents.policyDocs && documents.policyDocs.length > 0) {
         console.log("📄 [Repository] Linking Policy Documents:", documents.policyDocs.length);
