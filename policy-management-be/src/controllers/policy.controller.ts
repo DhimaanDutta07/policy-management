@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { parse } from "csv-parse/sync";
 import * as xlsx from "xlsx";
 import * as fs from "fs";
+import { PrismaClient } from '@prisma/client';
 import { policyService } from "./../services/policy.service";
 import { calculateAndSetCommission } from '../services/policy.service';
 import { 
@@ -14,6 +15,7 @@ import {
   validateDocumentLinking
 } from '../schemas/policy.schema';
 
+const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const extractUserId = (req: Request, res: Response): string | undefined => {
@@ -687,7 +689,25 @@ export const policyController = {
       //   });
       // }
 
-      await policyService.deletePolicy(req.params.id as string);
+      const policyId = req.params.id as string;
+
+      // Step 1: Delete references where this policy's documents are the source
+      await prisma.policyDocumentReference.deleteMany({
+        where: {
+          source_document: {
+            policy_id: policyId
+          }
+        }
+      });
+
+      // Step 2: Delete references where this policy references ancestor documents
+      await prisma.policyDocumentReference.deleteMany({
+        where: {
+          policy_id: policyId
+        }
+      });
+
+      await policyService.deletePolicy(policyId);
       res.status(200).json({
         success: true,
         message: 'Policy deleted successfully'

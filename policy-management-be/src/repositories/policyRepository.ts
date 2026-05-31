@@ -958,6 +958,23 @@ export const policyRepository = {
 
   // Delete a policy with all related data
   async deletePolicy(id: string) {
+    // Step 1: Delete references where this policy's documents are the source
+    await prisma.policyDocumentReference.deleteMany({
+      where: {
+        source_document: {
+          policy_id: id
+        }
+      }
+    });
+
+    // Step 2: Delete references where this policy references ancestor documents
+    await prisma.policyDocumentReference.deleteMany({
+      where: {
+        policy_id: id
+      }
+    });
+
+    // Step 3: Now safe to delete
     return prisma.policy.delete({
       where: { id },
       include: POLICY_FULL_INCLUDE,
