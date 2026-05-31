@@ -11,6 +11,18 @@ async function getApp() {
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  // Handle CORS preflight directly
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, role");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
   try {
     const expressApp = await getApp();
     return new Promise<void>((resolve, reject) => {
