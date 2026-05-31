@@ -377,6 +377,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const hasPermission = (permission: string): boolean => {
+    // Check if user has ADMIN role (case-insensitive)
+    if (role?.role_name?.toUpperCase() === 'ADMIN') {
+      return true;
+    }
+    // Otherwise check specific permission
     if (!role || !role.permissions) return false;
     return Boolean(role.permissions[permission]);
   };

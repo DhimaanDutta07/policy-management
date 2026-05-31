@@ -144,8 +144,6 @@ function PolicyDashBoardPage() {
       .then((result) => {
         console.log('🔍 [Frontend] Full API response:', result);
         if (result.success && result.data) {
-          console.log('Dashboard stats received:', result.data);
-          console.log('Monthly trend data:', result.data.monthlyTrend);
           setStats(result.data);
         } else {
           console.error('🔍 [Frontend] API returned error:', result);

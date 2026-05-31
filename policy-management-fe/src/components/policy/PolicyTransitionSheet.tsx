@@ -228,15 +228,7 @@ const PolicyTransitionSheet: React.FC<PolicyTransitionSheetProps> = ({
 
   // Pre-fill form with parent policy data - only after policy names are loaded
   useEffect(() => {
-    console.log('🔍 [PolicyTransitionSheet] Form population effect triggered:', {
-      hasPolicy: !!policy,
-      policyNamesCount: policyNames.length,
-      policyNameId: policy?.policy_name_id,
-      transitionType
-    });
-    
     if (policy && policyNames.length > 0) {
-      console.log('🔍 [PolicyTransitionSheet] Populating form with policy data...');
       
       // Clear form validation errors first
       clearErrors();
@@ -296,8 +288,6 @@ const PolicyTransitionSheet: React.FC<PolicyTransitionSheetProps> = ({
       setValue('end_date', endDate.toISOString().split('T')[0]);
       setValue('issued_date', new Date().toISOString().split('T')[0]);
       
-      console.log('🔍 [PolicyTransitionSheet] Form populated with policy_name_id:', policy.policy_name_id);
-      
       // Check eligibility for the new transition type
       checkEligibility();
     }
@@ -321,7 +311,6 @@ const PolicyTransitionSheet: React.FC<PolicyTransitionSheetProps> = ({
 
   const fetchPolicyNames = async () => {
     try {
-      console.log('🔍 [PolicyTransitionSheet] Fetching policy names...');
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/policy-names`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -330,7 +319,6 @@ const PolicyTransitionSheet: React.FC<PolicyTransitionSheetProps> = ({
       const data = await response.json();
       // Handle both array and object with data property
       const policyNamesData = Array.isArray(data) ? data : (data.data || []);
-      console.log('🔍 [PolicyTransitionSheet] Policy names fetched:', policyNamesData.length);
       setPolicyNames(policyNamesData);
     } catch (error) {
       console.error('Failed to fetch policy names:', error);

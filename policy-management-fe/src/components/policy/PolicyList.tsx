@@ -762,30 +762,28 @@ const PolicyList: React.FC<PolicyListProps> = ({
   const handleConfirmDelete = async () => {
     if (!policyToDelete) return;
     
-    if (onDeletePolicy) {
-      try {
-        await onDeletePolicy(policyToDelete.id);
-        policiesCache.current = [];
-        setDeleteDialogOpen(false);
-        setPolicyToDelete(null);
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/policies/${policyToDelete.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Policy deleted successfully");
+      policiesCache.current = [];
+      setDeleteDialogOpen(false);
+      setPolicyToDelete(null);
+      fetchPolicies();
+    } catch (err: any) {
+      const status = err.response?.status;
+      if (status === 404) {
+        toast.error("Policy no longer exists. Refreshing list...");
         fetchPolicies();
-      } catch {
         setDeleteDialogOpen(false);
         setPolicyToDelete(null);
-      }
-    } else {
-      try {
-        const token = localStorage.getItem("authToken");
-        await axios.delete(
-          `${import.meta.env.VITE_BASE_URL}/api/v1/policies/${policyToDelete.id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        toast.success("Policy deleted successfully");
-        policiesCache.current = [];
-        setDeleteDialogOpen(false);
-        setPolicyToDelete(null);
-        fetchPolicies();
-      } catch {
+      } else if (status === 500) {
+        toast.error("Failed to delete policy. Please try again.");
+        // Keep dialog open on 500 error
+      } else {
         toast.error("Failed to delete policy");
         setDeleteDialogOpen(false);
         setPolicyToDelete(null);
@@ -1467,6 +1465,9 @@ const PolicyList: React.FC<PolicyListProps> = ({
             <DialogContent className="sm:max-w-[425px] bg-white">
               <DialogHeader>
                 <DialogTitle className="text-left">Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                  Please confirm that you want to delete this policy. This action cannot be undone.
+                </DialogDescription>
               </DialogHeader>
               <div className="py-4">
                 <span className="text-red-500 font-extrabold">* </span>
@@ -1509,6 +1510,9 @@ const PolicyList: React.FC<PolicyListProps> = ({
                   <Download className="w-5 h-5 text-blue-500 flex-shrink-0" />
                   <span className="truncate">Import Policies (CSV/XLSX)</span>
                 </DialogTitle>
+                <DialogDescription>
+                  Upload a CSV or XLSX file to import policies in bulk.
+                </DialogDescription>
               </DialogHeader>
               
               <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 sm:space-y-6">
