@@ -26,7 +26,7 @@
 
 // // Get all weighing inspections with optional filtering
 // export const getTodaysWeighingInspectionsByUser = asyncTryCatch(async (req: Request, res: Response) => {
-//   const { userId } = req.params; // Get userId from route params
+//   const userId = req.params.userId as string; // Get userId from route params
   
 //   if (!userId) {
 //     throw new AppError(400, 'ClientError', 'User ID is required');
@@ -42,7 +42,7 @@
 
 // // Get a specific weighing inspection by ID
 // export const getWeighingInspectionById = asyncTryCatch(async (req: Request, res: Response) => {
-//   const { id } = req.params;
+//   const id = req.params.id as string;
   
 //   const inspection = await getWeighingInspectionByIdService(id);
   

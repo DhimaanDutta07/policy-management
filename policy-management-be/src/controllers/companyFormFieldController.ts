@@ -20,7 +20,7 @@ export const companyFormFieldController = {
 
   async getCompanyFormFields(req: Request, res: Response) {
     try {
-      const { companyId } = req.params;
+      const companyId = req.params.companyId as string;
       const fields = await companyFormFieldService.getCompanyFormFields(companyId);
       res.json(fields);
     } catch (error) {

@@ -119,7 +119,7 @@ export const commissionRuleController = {
   async updateCommissionRulesStatusByPolicyName(req: Request, res: Response) {
     try {
       const { is_active } = req.body;
-      const { policyNameId } = req.params;
+      const policyNameId = req.params.policyNameId as string;
       if (typeof is_active !== 'boolean') {
         res.status(400).json({ error: 'is_active must be boolean' });
         return;

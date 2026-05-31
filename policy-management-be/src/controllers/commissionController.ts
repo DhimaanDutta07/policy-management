@@ -67,7 +67,7 @@ export const commissionController = {
   // Get commission rules for a specific policy name
   async getCommissionRulesByPolicyName(req: Request, res: Response) {
     try {
-      const { policyNameId } = req.params;
+      const policyNameId = req.params.policyNameId as string;
       
       const commissionRules = await prisma.commissionRule.findMany({
         where: {

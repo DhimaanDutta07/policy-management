@@ -86,7 +86,7 @@
 
 // export const getTodaysQualityInspectionsByUser = asyncTryCatch(
 //   async (req: Request, res: Response) => {
-//     const { userId } = req.params; // Get userId from route params
+//     const userId = req.params.userId as string; // Get userId from route params
 
 //     if (!userId) {
 //       throw new AppError(400, "ClientError", "User ID is required");

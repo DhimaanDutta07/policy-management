@@ -180,7 +180,7 @@ export class ClaimController {
   
   async getPolicyClaims(req: Request, res: Response): Promise<void> {
     try {
-      const { policyId } = req.params;
+      const policyId = req.params.policyId as string;
       const claims = await claimService.getClaimsByPolicy(policyId);
       
       res.status(200).json({
@@ -208,7 +208,7 @@ export class ClaimController {
     }
 
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const validation = validateClaimStatusUpdate(req.body);
       
       if (!validation.success) {
@@ -376,7 +376,7 @@ export class ClaimController {
     }
 
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       
       const existingClaim = await claimService.getClaimById(id);
       if (!existingClaim) {

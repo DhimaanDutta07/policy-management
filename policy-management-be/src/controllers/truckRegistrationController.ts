@@ -116,7 +116,7 @@
 
 // // Get a specific truck registration by ID
 // export const getTruckRegistrationById = asyncTryCatch(async (req: Request, res: Response) => {
-//   const { id } = req.params;
+//   const id = req.params.id as string;
   
 //   const truckRegistration = await getTruckRegistrationByIdService(id);
   
@@ -138,7 +138,7 @@
 // // })
 
 // export const getTodaysTruckRegistrationsByUser = asyncTryCatch(async (req: Request, res: Response) => {
-//   const { userId } = req.params; // Get userId from route params
+//   const userId = req.params.userId as string; // Get userId from route params
   
 //   if (!userId) {
 //     throw new AppError(400, 'ClientError', 'User ID is required');
@@ -153,7 +153,7 @@
 // });
 
 // export const DashboardDetails = asyncTryCatch(async(req: Request, res: Response) => {
-//   const { timePeriod } = req.params;
+//   const timePeriod = req.params.timePeriod as string;
 
 //   if (!timePeriod) {
 //     throw new AppError(400, 'ClientError', 'Time period is required');
@@ -168,7 +168,7 @@
 // });
 
 // // export const AssignPO = asyncTryCatch(async(req: Request, res: Response) => {
-// //   const { id } = req.params;
+// //   const id = req.params.id as string;
 // //   const { po_id } = req.body;
 
 // //   if (!id || !po_id) {

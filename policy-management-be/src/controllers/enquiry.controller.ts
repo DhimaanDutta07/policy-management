@@ -49,7 +49,7 @@ export const enquiryController = {
   // Get all enquiries
   async getAllEnquiries(req: Request, res: Response) {
     try {
-      // const { timePeriod } = req.params;
+      // const timePeriod = req.params.timePeriod as string;
       // const { siteId } = req.query;
     
       let enquiries;

@@ -211,7 +211,7 @@
 // });
 
 // export const getPurchaseOrderTrucks = asyncTryCatch(async (req: Request, res: Response) => {
-//   const { id } = req.params;
+//   const id = req.params.id as string;
   
 //   // Validate the purchase order ID
 //   const validation = purchaseOrderIdParamSchema.safeParse({ id });

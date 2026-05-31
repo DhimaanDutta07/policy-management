@@ -62,7 +62,7 @@ export const companyController = {
 
   async getCompanyFormFields(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const fields = await companyService.getCompanyFormFields(id);
       res.json(fields);
     } catch (error) {
