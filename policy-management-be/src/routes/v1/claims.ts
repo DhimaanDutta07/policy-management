@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
       
       try {
         // Get policy information to create the same folder structure as policies
-        const policyId = req.params. as string || req.body.policy_id;
+        const policyId = req.params.policyId as string || req.body.policy_id;
         if (policyId) {
           try {
             const { PrismaClient } = require('@prisma/client');
