@@ -2,14 +2,13 @@ let app;
 
 async function getApp() {
   if (!app) {
-    const server = require("../src/server.ts");
+    const server = require("../dist/server"); // ✅ compiled JS, not .ts
     app = server.default || server;
   }
   return app;
 }
 
 module.exports = async function handler(req, res) {
-  // Handle CORS preflight directly
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, role");
@@ -30,10 +29,11 @@ module.exports = async function handler(req, res) {
     });
   } catch (err) {
     console.error("Initialization error:", err);
-    res.status(500).json({
+    res.statusCode = 500;
+    res.end(JSON.stringify({
       error: "Initialization Error",
       message: err.message,
       stack: err.stack,
-    });
+    }));
   }
 };

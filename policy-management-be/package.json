@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node src/server.ts",
-    "build": "prisma generate && tsc --outDir dist",
-    "postinstall": "prisma generate",
-    "start": "node dist/server.js"
-  },
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "ts-node src/server.ts",
+  "build": "prisma generate && tsc --outDir dist",
+  "vercel-build": "prisma generate && tsc --outDir dist", 
+  "postinstall": "prisma generate",
+  "start": "node dist/server.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
