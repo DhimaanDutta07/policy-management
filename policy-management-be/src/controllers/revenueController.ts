@@ -11,8 +11,8 @@ import {
 
 export const getRevenuesByTimePeriod = async (req: Request, res: Response) => {
   try {
-    const siteId = req.params.siteId as string === "all" ? null : req.params.siteId as string;
-    const period = req.params.timePeriod as string;
+    const siteId = req.params.siteI as stringd as string === "all" ? null : req.params.siteI as stringd as string;
+    const period = req.params.timePerio as stringd as string;
     const revenues = await findRevenuesByTimePeriod(siteId, period);
     res.status(200).json(revenues);
   } catch (error) {
@@ -35,7 +35,7 @@ export const getAllRevenues = async (req: Request, res: Response) => {
 
 export const getRevenue = async (req: Request, res: Response) => {
   try {
-    const revenue = await getRevenueById(req.params.id as string);
+    const revenue = await getRevenueById(req.params.i as stringd as string);
     if (!revenue) {
       res.status(404).json({ error: "Revenue not found" });
       return;
@@ -65,7 +65,7 @@ export const createRevenueHandler = async (req: Request, res: Response) => {
 
 export const updateRevenueHandler = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.i as stringd as string;
     const data = updateRevenueSchema.parse(req.body);
     const revenue = await updateRevenue(id, {
       ...data,
@@ -83,7 +83,7 @@ export const updateRevenueHandler = async (req: Request, res: Response) => {
 
 export const deleteRevenueHandler = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.i as stringd as string;
     const revenue = await softDeleteRevenue(id);
     res.status(200).json(revenue);
   } catch (error) {

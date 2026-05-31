@@ -130,8 +130,8 @@ export class ClaimController {
       });
 
       // Add policy_id from URL params if not in body
-      if (!validationResult.data.policy_id && req.params.policyId) {
-        validationResult.data.policy_id = req.params.policyId;
+      if (!validationResult.data.policy_id && req.params.policyId as string) {
+        validationResult.data.policy_id = req.params.policyId as string;
       }
 
       const claim = await claimService.createClaim(
@@ -269,7 +269,7 @@ export class ClaimController {
     }
     
     try {
-      const claimId = req.params.id;
+      const claimId = req.params.id as string;
       if (!claimId) {
         res.status(400).json({
           error: 'Claim ID is required',
@@ -407,12 +407,12 @@ export class ClaimController {
 
   async getClaimById(req: Request, res: Response): Promise<void> {
     try {
-      const claim = await claimService.getClaimById(req.params.id);
+      const claim = await claimService.getClaimById(req.params.id as string);
       
       if (!claim) {
         res.status(404).json({ 
           error: "Claim not found",
-          message: `Claim with ID ${req.params.id} does not exist`,
+          message: `Claim with ID ${req.params.id as string} does not exist`,
           timestamp: new Date().toISOString()
         });
         return;

@@ -8,7 +8,7 @@
 //     res.json(reimbursements);
 //   },
 //   getById: async (req: Request, res: Response) => {
-//     const reimbursement = await reimbursementService.getReimbursementById(req.params.id);
+//     const reimbursement = await reimbursementService.getReimbursementById(req.params.id as string);
 //     res.json(reimbursement);
 //   },
 //   create: async (req: Request, res: Response) => {
@@ -21,12 +21,12 @@
 //   },
 //   update: async (req: Request, res: Response) => {
 //     const data = reimbursementUpdateSchema.parse(req.body);
-//     const reimbursement = await reimbursementService.updateReimbursement(req.params.id, data);
+//     const reimbursement = await reimbursementService.updateReimbursement(req.params.id as string, data);
 //     res.json(reimbursement);
 //   },
 //   delete: async (req: Request, res: Response) => {
 //     try {
-//       await reimbursementService.deleteReimbursement(req.params.id);
+//       await reimbursementService.deleteReimbursement(req.params.id as string);
 //       res.status(204).send();
 //     } catch (error) {
 //       if (error instanceof Error) {

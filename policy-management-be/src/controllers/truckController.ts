@@ -48,7 +48,7 @@
 
 // // Get a single truck by ID
 // export const getTruckById = asyncTryCatch(async (req: Request, res: Response) => {
-//   const truckId = req.params.id;
+//   const truckId = req.params.id as string;
   
 //   const truck = await getTruckByIdService(truckId);
   
@@ -66,7 +66,7 @@
 
 // // Update a truck
 // export const updateTruck = asyncTryCatch(async (req: Request, res: Response) => {
-//   const truckId = req.params.id;
+//   const truckId = req.params.id as string;
 //   const validatedData = UpdateTruckSchema.parse(req.body);
   
 //   try {
@@ -88,7 +88,7 @@
 
 // // Delete a truck
 // export const deleteTruck = asyncTryCatch(async (req: Request, res: Response) => {
-//   const truckId = req.params.id;
+//   const truckId = req.params.id as string;
   
 //   try {
 //     await deleteTruckService(truckId);

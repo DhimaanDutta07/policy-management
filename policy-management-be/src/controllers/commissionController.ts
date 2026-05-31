@@ -33,7 +33,7 @@ export const commissionController = {
 
   async getCommissionById(req: Request, res: Response) {
     try {
-      const commission = await commissionService.getCommissionById(req.params.id);
+      const commission = await commissionService.getCommissionById(req.params.id as string);
       if (!commission) return res.status(404).json({ error: 'Commission not found' });
       res.status(200).json(commission);
     } catch (error) {
@@ -44,7 +44,7 @@ export const commissionController = {
   async updateCommission(req: Request, res: Response) {
     try {
       const data = commissionUpdateSchema.parse(req.body);
-      const commission = await commissionService.updateCommission(req.params.id, data);
+      const commission = await commissionService.updateCommission(req.params.id as string, data);
       res.status(200).json(commission);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -57,7 +57,7 @@ export const commissionController = {
 
   async deleteCommission(req: Request, res: Response) {
     try {
-      const result = await commissionService.deleteCommission(req.params.id);
+      const result = await commissionService.deleteCommission(req.params.id as string);
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });

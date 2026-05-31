@@ -27,7 +27,7 @@
   
 //   // Get vendor by ID
 //   getVendorById: asyncTryCatch(async (req: Request, res: Response) => {
-//     const id = req.params.id;
+//     const id = req.params.id as string;
     
 //     const vendor = await vendorService.getVendorDetailById(id);
     
@@ -59,7 +59,7 @@
   
 //   // Update vendor
 //   updateVendor: asyncTryCatch(async (req: Request, res: Response) => {
-//     const id = req.params.id;
+//     const id = req.params.id as string;
 //     const { status, ...otherData } = req.body;
     
 //     // If only status is being updated
@@ -125,7 +125,7 @@
   
 //   // Delete vendor
 //   deleteVendor: asyncTryCatch(async (req: Request, res: Response) => {
-//     const id = req.params.id;
+//     const id = req.params.id as string;
     
 //     await vendorService.deleteVendor(id);
     

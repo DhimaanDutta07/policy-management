@@ -30,7 +30,7 @@ export const companyFormFieldController = {
 
   async getCompanyFormFieldById(req: Request, res: Response) {
     try {
-      const formField = await companyFormFieldService.getCompanyFormFieldById(req.params.id);
+      const formField = await companyFormFieldService.getCompanyFormFieldById(req.params.id as string);
       if (!formField) return res.status(404).json({ error: 'Form field not found' });
       res.json(formField);
     } catch (error) {
@@ -41,7 +41,7 @@ export const companyFormFieldController = {
   async updateCompanyFormField(req: Request, res: Response) {
     try {
       const data = companyFormFieldUpdateSchema.parse(req.body);
-      const formField = await companyFormFieldService.updateCompanyFormField(req.params.id, data);
+      const formField = await companyFormFieldService.updateCompanyFormField(req.params.id as string, data);
       res.json(formField);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -54,7 +54,7 @@ export const companyFormFieldController = {
 
   async deleteCompanyFormField(req: Request, res: Response) {
     try {
-      await companyFormFieldService.deleteCompanyFormField(req.params.id);
+      await companyFormFieldService.deleteCompanyFormField(req.params.id as string);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete form field' });

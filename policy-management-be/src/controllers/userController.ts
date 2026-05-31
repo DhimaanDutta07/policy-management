@@ -156,7 +156,7 @@ export const getAllUsers = asyncTryCatch(
 
 export const updateUser = asyncTryCatch(async (req: Request, res: Response) => {
   // Validate UUID format
-  const userId = z.string().uuid().parse(req.params.id);
+  const userId = z.string().uuid().parse(req.params.id as string);
 
   // Validate permissions if provided
   if (req.body.permissions) {
@@ -194,7 +194,7 @@ export const updateUser = asyncTryCatch(async (req: Request, res: Response) => {
 
 export const deleteUser = asyncTryCatch(async (req: Request, res: Response) => {
   // Validate UUID format
-  const userId = z.string().uuid().parse(req.params.id);
+  const userId = z.string().uuid().parse(req.params.id as string);
 
   await deleteUserById(userId);
 
@@ -204,7 +204,7 @@ export const deleteUser = asyncTryCatch(async (req: Request, res: Response) => {
 export const updateUserStatus = asyncTryCatch(
   async (req: Request, res: Response) => {
     // Validate UUID format
-    const userId = z.string().uuid().parse(req.params.id);
+    const userId = z.string().uuid().parse(req.params.id as string);
 
     // Validate status
     const status = z
@@ -243,7 +243,7 @@ export const verifyUserOTP = asyncTryCatch(async (req: Request, res: Response) =
 export const updateUserAppAccess = asyncTryCatch(
   async (req: Request, res: Response) => {
     // Validate UUID format
-    const userId = z.string().uuid().parse(req.params.id);
+    const userId = z.string().uuid().parse(req.params.id as string);
 
     // Validate app access data
     const { app_access } = appAccessSchema.parse(req.body);
@@ -265,7 +265,7 @@ export const updateUserAppAccess = asyncTryCatch(
 export const updateUserWebAccess = asyncTryCatch(
   async (req: Request, res: Response) => {
     // Validate UUID format
-    const userId = z.string().uuid().parse(req.params.id);
+    const userId = z.string().uuid().parse(req.params.id as string);
 
     // Validate web access data
     const { web_access } = webAccessSchema.parse(req.body);

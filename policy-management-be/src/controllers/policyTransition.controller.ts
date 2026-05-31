@@ -6,7 +6,7 @@ import { PolicyTransitionType } from '@prisma/client';
 
 // Create policy renewal
 export const createPolicyRenewal = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { parentPolicyId } = req.params;
+  const parentPolicyId = req.params.parentPolicyI as stringd as string;
   const newPolicyData = req.body;
   
   // Validate transition eligibility
@@ -53,7 +53,7 @@ export const createPolicyRenewal = asyncTryCatch(async (req: Request, res: Respo
 
 // Create policy migration
 export const createPolicyMigration = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { parentPolicyId } = req.params;
+  const parentPolicyId = req.params.parentPolicyI as stringd as string;
   const newPolicyData = req.body;
   
   // Validate transition eligibility
@@ -100,7 +100,7 @@ export const createPolicyMigration = asyncTryCatch(async (req: Request, res: Res
 
 // Create policy portability
 export const createPolicyPortability = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { parentPolicyId } = req.params;
+  const parentPolicyId = req.params.parentPolicyI as stringd as string;
   const newPolicyData = req.body;
   
   // Validate transition eligibility
@@ -147,7 +147,7 @@ export const createPolicyPortability = asyncTryCatch(async (req: Request, res: R
 
 // Get policy transition history
 export const getPolicyTransitionHistory = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { policyId } = req.params;
+  const policyId = req.params.policyI as stringd as string;
   
   const history = await PolicyTransitionService.getPolicyTransitionHistory(policyId);
   
@@ -159,7 +159,7 @@ export const getPolicyTransitionHistory = asyncTryCatch(async (req: Request, res
 
 // Get policy documents with inheritance
 export const getPolicyDocuments = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { policyId } = req.params;
+  const policyId = req.params.policyI as stringd as string;
   const { includeInherited = 'true', transitionType } = req.query;
   
   console.log(`🌐 getPolicyDocuments API called for policy: ${policyId}`);
@@ -188,7 +188,7 @@ export const getPolicyDocuments = asyncTryCatch(async (req: Request, res: Respon
 
 // Validate transition eligibility
 export const validateTransitionEligibility = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { parentPolicyId } = req.params;
+  const parentPolicyId = req.params.parentPolicyI as stringd as string;
   const { transitionType } = req.query;
   
   if (!transitionType || !['RENEWAL', 'MIGRATION', 'PORTABILITY'].includes(transitionType as string)) {
@@ -211,7 +211,7 @@ export const validateTransitionEligibility = asyncTryCatch(async (req: Request, 
 
 // Get document access statistics
 export const getDocumentAccessStats = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { policyId } = req.params;
+  const policyId = req.params.policyI as stringd as string;
   
   const stats = await DocumentAccessService.getDocumentAccessStats(policyId);
   
@@ -223,7 +223,7 @@ export const getDocumentAccessStats = asyncTryCatch(async (req: Request, res: Re
 
 // Clear document cache
 export const clearDocumentCache = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { policyId } = req.params;
+  const policyId = req.params.policyI as stringd as string;
   
   DocumentAccessService.clearCache(policyId);
   
@@ -234,7 +234,7 @@ export const clearDocumentCache = asyncTryCatch(async (req: Request, res: Respon
 
 // Delete document reference
 export const deleteDocumentReference = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { referenceId } = req.params;
+  const referenceId = req.params.referenceI as stringd as string;
   
   if (!referenceId) {
     res.status(400).json({
@@ -285,7 +285,7 @@ export const updateExistingReferencesToDeletable = asyncTryCatch(async (req: Req
 
 // Get document transfer statistics for policy transition
 export const getDocumentTransferStats = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
-  const { parentPolicyId } = req.params;
+  const parentPolicyId = req.params.parentPolicyI as stringd as string;
   const { transitionType } = req.query;
   
   if (!transitionType || !['RENEWAL', 'MIGRATION', 'PORTABILITY'].includes(transitionType as string)) {

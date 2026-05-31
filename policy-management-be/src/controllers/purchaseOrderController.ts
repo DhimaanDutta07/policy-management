@@ -62,8 +62,8 @@
 // });
 
 // export const getPurchaseOrder = asyncTryCatch(async (req: Request, res: Response) => {
-//   // console.log("This is working", req.params.id)
-//   const purchaseOrder = await purchaseOrderService.getPurchaseOrderById(req.params.id);
+//   // console.log("This is working", req.params.id as string)
+//   const purchaseOrder = await purchaseOrderService.getPurchaseOrderById(req.params.id as string);
 //   res.json({
 //     success: true,
 //     data: purchaseOrder,
@@ -161,7 +161,7 @@
 // });
 
 // export const deletePurchaseOrder = asyncTryCatch(async (req: Request, res: Response) => {
-//   await purchaseOrderService.deletePurchaseOrder(req.params.id);
+//   await purchaseOrderService.deletePurchaseOrder(req.params.id as string);
 //   res.json({
 //     success: true,
 //     message: 'Purchase order deleted successfully',
@@ -169,7 +169,7 @@
 // });
 
 // export const downloadPurchaseOrder = asyncTryCatch(async (req: Request, res: Response) => {
-//   const purchaseOrder = await purchaseOrderService.getPurchaseOrderById(req.params.id);
+//   const purchaseOrder = await purchaseOrderService.getPurchaseOrderById(req.params.id as string);
   
 //   if (!purchaseOrder.document_path) {
 //     return res.status(404).json({

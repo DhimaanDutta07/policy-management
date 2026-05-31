@@ -44,7 +44,7 @@
 
 // // Get a single raw material by ID
 // export const getRawMaterialById = asyncTryCatch(async (req: Request, res: Response) => {
-//   const rawMaterialId = req.params.id;
+//   const rawMaterialId = req.params.id as string;
   
 //   const rawMaterial = await getRawMaterialByIdService(rawMaterialId);
   
@@ -62,7 +62,7 @@
 
 // // Update a raw material
 // export const updateRawMaterial = asyncTryCatch(async (req: Request, res: Response) => {
-//   const rawMaterialId = req.params.id;
+//   const rawMaterialId = req.params.id as string;
 //   const validatedData = rawMaterialUpdateSchema.parse(req.body);
   
 //   const updatedRawMaterial = await updateRawMaterialService(rawMaterialId, validatedData);
@@ -81,7 +81,7 @@
 
 // // Delete a raw material
 // export const deleteRawMaterial = asyncTryCatch(async (req: Request, res: Response) => {
-//   const rawMaterialId = req.params.id;
+//   const rawMaterialId = req.params.id as string;
   
 //   const deleted = await deleteRawMaterialService(rawMaterialId);
   

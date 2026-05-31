@@ -29,7 +29,7 @@ export const companyController = {
 
   async getCompanyById(req: Request, res: Response) {
     try {
-      const company = await companyService.getCompanyById(req.params.id);
+      const company = await companyService.getCompanyById(req.params.id as string);
       if (!company) return res.status(404).json({ error: 'Company not found' });
       res.json(company);
     } catch (error) {
@@ -40,7 +40,7 @@ export const companyController = {
   async updateCompany(req: Request, res: Response) {
     try {
       const data = companyUpdateSchema.parse(req.body);
-      const company = await companyService.updateCompany(req.params.id, data);
+      const company = await companyService.updateCompany(req.params.id as string, data);
       res.json(company);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -53,7 +53,7 @@ export const companyController = {
 
   async deleteCompany(req: Request, res: Response) {
     try {
-      await companyService.deleteCompany(req.params.id);
+      await companyService.deleteCompany(req.params.id as string);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete company' });

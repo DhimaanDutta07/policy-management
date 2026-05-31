@@ -43,7 +43,7 @@ export const policyTypeController = {
   async getPolicyTypeById(req: Request, res: Response) {
     try {
       const policyType = await prisma.policyType.findUnique({
-        where: { id: req.params.id as string },
+        where: { id: req.params.i as stringd as string },
         select: {
           id: true,
           name: true,
@@ -102,7 +102,7 @@ export const policyTypeController = {
       const data = updatePolicyTypeSchema.parse(req.body);
       
       const policyType = await prisma.policyType.update({
-        where: { id: req.params.id as string },
+        where: { id: req.params.i as stringd as string },
         data: data,
         select: {
           id: true,
@@ -135,7 +135,7 @@ export const policyTypeController = {
     try {
       // Check if policy type has associated policies
       const policyType = await prisma.policyType.findUnique({
-        where: { id: req.params.id as string },
+        where: { id: req.params.i as stringd as string },
         include: {
           _count: {
             select: {
@@ -156,7 +156,7 @@ export const policyTypeController = {
       }
       
       await prisma.policyType.delete({
-        where: { id: req.params.id as string },
+        where: { id: req.params.i as stringd as string },
       });
       
       res.status(204).send();

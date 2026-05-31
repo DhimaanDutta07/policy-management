@@ -76,7 +76,7 @@ export const enquiryController = {
   // Get a single enquiry by ID
   async getEnquiryById(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id = req.params.id as string;
       const enquiry = await enquiryService.getEnquiryById(id);
       if (!enquiry) {
         return res.status(404).json({ error: "Enquiry not found" });
@@ -91,7 +91,7 @@ export const enquiryController = {
   // Update an enquiry
   async updateEnquiry(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id = req.params.id as string;
       const userId = extractUserId(req);
       
       if (!userId) {
@@ -125,7 +125,7 @@ export const enquiryController = {
   // Delete an enquiry
   async deleteEnquiry(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id = req.params.id as string;
       const userId = extractUserId(req);
       
       if (!userId) {

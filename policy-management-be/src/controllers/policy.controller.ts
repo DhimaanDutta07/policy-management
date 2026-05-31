@@ -470,15 +470,15 @@ export const policyController = {
   // Get single policy by ID with enhanced response
   async getPolicyById(req: Request, res: Response) {
     try {
-      // console.log(`Fetching policy with ID: ${req.params.id}`);
+      // console.log(`Fetching policy with ID: ${req.params.id as string}`);
       
-      const policy = await policyService.getPolicyById(req.params.id);
+      const policy = await policyService.getPolicyById(req.params.id as string);
       
       if (!policy) {
-        // console.log(`Policy not found with ID: ${req.params.id}`);
+        // console.log(`Policy not found with ID: ${req.params.id as string}`);
         return res.status(404).json({ 
           error: "Policy not found",
-          message: `Policy with ID ${req.params.id} does not exist`,
+          message: `Policy with ID ${req.params.id as string} does not exist`,
           timestamp: new Date().toISOString()
         });
       }
@@ -519,7 +519,7 @@ export const policyController = {
     }
     
     try {
-      const policyId = req.params.id;
+      const policyId = req.params.id as string;
       if (!policyId) {
         res.status(400).json({
           error: 'Policy ID is required',
@@ -669,11 +669,11 @@ export const policyController = {
     }
 
     try {
-      const existingPolicy = await policyService.getPolicyById(req.params.id);
+      const existingPolicy = await policyService.getPolicyById(req.params.id as string);
       if (!existingPolicy) {
         return res.status(404).json({ 
           error: "Policy not found",
-          message: `Policy with ID ${req.params.id} does not exist`,
+          message: `Policy with ID ${req.params.id as string} does not exist`,
           timestamp: new Date().toISOString()
         });
       }
@@ -686,7 +686,7 @@ export const policyController = {
         });
       }
 
-      await policyService.deletePolicy(req.params.id);
+      await policyService.deletePolicy(req.params.id as string);
       res.status(200).json({
         success: true,
         message: 'Policy deleted successfully'
@@ -865,7 +865,7 @@ export const policyController = {
     }
     
     try {
-      const documentId = req.params.id;
+      const documentId = req.params.id as string;
       
       // Get document details from database first
       const document = await policyService.getDocumentById(documentId);
@@ -930,7 +930,7 @@ export const policyController = {
     }
     
     try {
-      const documentId = req.params.id;
+      const documentId = req.params.id as string;
       
       if (!documentId) {
         return res.status(400).json({ 

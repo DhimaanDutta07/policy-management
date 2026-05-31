@@ -34,7 +34,7 @@ export const agentController = {
 
   async getAgentById(req: Request, res: Response) {
     try {
-      const agent = await agentService.getAgentById(req.params.id);
+      const agent = await agentService.getAgentById(req.params.id as string);
       if (!agent) return res.status(404).json({ error: 'Agent not found' });
       res.status(200).json(agent);
     } catch (error) {
@@ -45,7 +45,7 @@ export const agentController = {
   async updateAgent(req: Request, res: Response) {
     try {
       const data = agentUpdateSchema.parse(req.body);
-      const agent = await agentService.updateAgent(req.params.id, data);
+      const agent = await agentService.updateAgent(req.params.id as string, data);
       res.status(200).json(agent);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -58,7 +58,7 @@ export const agentController = {
 
   async deleteAgent(req: Request, res: Response) {
     try {
-      await agentService.deleteAgent(req.params.id);
+      await agentService.deleteAgent(req.params.id as string);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });

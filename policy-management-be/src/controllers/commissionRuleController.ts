@@ -68,7 +68,7 @@ export const commissionRuleController = {
 
   async getCommissionRuleById(req: Request, res: Response) {
     try {
-      const rule = await commissionRuleService.getCommissionRuleById(req.params.id);
+      const rule = await commissionRuleService.getCommissionRuleById(req.params.id as string);
       if (!rule) return res.status(404).json({ error: 'Commission rule not found' });
       res.status(200).json(rule);
     } catch (error: any) {
@@ -79,7 +79,7 @@ export const commissionRuleController = {
   async updateCommissionRule(req: Request, res: Response) {
     try {
       const data = commissionRuleUpdateSchema.parse(req.body);
-      const rule = await commissionRuleService.updateCommissionRule(req.params.id, data);
+      const rule = await commissionRuleService.updateCommissionRule(req.params.id as string, data);
       res.status(200).json(rule);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
@@ -92,7 +92,7 @@ export const commissionRuleController = {
 
   async deleteCommissionRule(req: Request, res: Response) {
     try {
-      const result = await commissionRuleService.deleteCommissionRule(req.params.id);
+      const result = await commissionRuleService.deleteCommissionRule(req.params.id as string);
       if (result.success === false) {
         return res.status(400).json({ error: result.error });
       }
@@ -105,7 +105,7 @@ export const commissionRuleController = {
   // New method for updating CommissionRule status
   updateCommissionRuleStatus: asyncTryCatch(async (req: Request, res: Response) => {
     // Validate UUID format
-    const ruleId = z.string().uuid().parse(req.params.id);
+    const ruleId = z.string().uuid().parse(req.params.id as string);
 
     // Validate status
     const { is_active } = commissionRuleStatusSchema.parse(req.body);

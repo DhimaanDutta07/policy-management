@@ -8,7 +8,7 @@
 // //     res.json(clients);
 // //   },
 // //   getById: async (req: Request, res: Response) => {
-// //     const client = await getClientById(req.params.id);
+// //     const client = await getClientById(req.params.id as string);
 // //     res.json(client);
 // //   },
 // //   create: async (req: Request, res: Response) => {
@@ -22,11 +22,11 @@
 // //   },
 // //   update: async (req: Request, res: Response) => {
 // //     const data = clientUpdateSchema.parse(req.body);
-// //     const client = await updateClient(req.params.id, data);
+// //     const client = await updateClient(req.params.id as string, data);
 // //     res.json(client);
 // //   },
 // //   delete: async (req: Request, res: Response) => {
-// //     await deleteClient(req.params.id);
+// //     await deleteClient(req.params.id as string);
 // //     res.status(204).send();
 // //   },
 // // };
@@ -69,7 +69,7 @@
 
 // export const getClientById = async (req: Request, res: Response) => {
 //   try {
-//     const client = await clientService.getClientById(req.params.id);
+//     const client = await clientService.getClientById(req.params.id as string);
 //     res.status(200).json(client);
 //   } catch (error) {
 //     res.status(404).json({ error: error instanceof Error ? error.message : 'Not Found' });
@@ -79,7 +79,7 @@
 // export const updateClient = async (req: Request, res: Response) => {
 //   try {
 //     const data = clientSchema.parse(req.body);
-//     const client = await clientService.updateClient(req.params.id, {
+//     const client = await clientService.updateClient(req.params.id as string, {
 //       ...data,
 //       phone: data.phone ? String(data.phone) : null,
 //     });
@@ -95,7 +95,7 @@
 
 // export const deleteClient = async (req: Request, res: Response) => {
 //   try {
-//     const client = await clientService.deleteClient(req.params.id);
+//     const client = await clientService.deleteClient(req.params.id as string);
 //     res.status(200).json(client);
 //   } catch (error) {
 //     if (error instanceof Error) {
