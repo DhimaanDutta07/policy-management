@@ -234,16 +234,14 @@ setupRoutes(app);
 
 async function startApp(): Promise<void> {
   try {
-    // ensureUploadDir();
+    // ✅ Always connect to DB, even on Vercel
+    await establishDatabaseConnection();
 
     if (!process.env.VERCEL) {
-      await establishDatabaseConnection();
-      // Seed data
+      // Seed data only on local/server
       await seedData();
-    }
 
-    // Start server
-    if (!process.env.VERCEL) {
+      // Start server only on local/server (Vercel handles this itself)
       const port = process.env.PORT || 3000;
       app.listen(port, () => {
         console.log(
