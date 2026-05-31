@@ -2,8 +2,8 @@ let app;
 
 async function getApp() {
   if (!app) {
-    const server = await import("../dist/src/server.js");
-    app = server.default;
+    const server = require("../dist/src/server.js");
+    app = server.default || server;
   }
   return app;
 }

@@ -8,8 +8,8 @@ import { mkdir } from 'fs/promises';
 
 const pipelineAsync = promisify(pipeline);
 
-// Use a web-accessible path on DigitalOcean
-const STORAGE_DIR = process.env.STORAGE_DIR || '/var/www/html/uploads';  // Make sure this is web accessible
+// Use a web-accessible path on DigitalOcean, or /tmp on Vercel
+const STORAGE_DIR = process.env.STORAGE_DIR || (process.env.VERCEL ? '/tmp/uploads' : '/var/www/html/uploads');
 const MATERIAL_RECEIPTS_DIR = path.join(STORAGE_DIR, 'material-receipts');
 export const IMAGES_DIR = path.join(MATERIAL_RECEIPTS_DIR, 'images');
 
@@ -32,7 +32,10 @@ async function ensureDirectoriesExist() {
 // Ensure directories exist on startup
 ensureDirectoriesExist().catch(error => {
   console.error('Failed to create storage directories:', error);
-  process.exit(1);
+  // Don't exit on Vercel - /tmp may not exist at startup but will be created on demand
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });
 
 // export async function uploadFile(file: Express.Multer.File) {
