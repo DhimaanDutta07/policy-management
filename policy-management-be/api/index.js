@@ -2,7 +2,7 @@ let app;
 
 async function getApp() {
   if (!app) {
-    const server = await import("../dist/src/server.js");
+    const server = await import("../dist/server.js");
     app = server.default;
   }
   return app;
