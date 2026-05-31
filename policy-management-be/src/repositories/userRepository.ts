@@ -171,7 +171,7 @@ export async function findUserById(id: string) {
       include: {
         role: {
           select: {
-            Id: true,
+            id: true,
             role_name: true,
           },
         },

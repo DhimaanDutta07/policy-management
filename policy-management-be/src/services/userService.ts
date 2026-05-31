@@ -80,7 +80,7 @@ export async function registerUser(userData: any) {
         "CompanyFormField",
       ],
     }, // Set default permissions if not provided
-    role_id: adminRole.Id,
+    role_id: adminRole.id,
   });
 
   return user;
@@ -166,7 +166,7 @@ export async function createUser(userData: any, roleName: string) {
     email: email || null,
     phone,
     permissions: permissions || { app: [], web: [] }, // Set default permissions if not provided
-    role_id: role ? role.Id : null,
+    role_id: role ? role.id : null,
   });
 
   // Create UserSite entries for each site
@@ -254,7 +254,7 @@ export async function updateUserService(
         // Create the role if it doesn't exist
         newRole = await createRole(roleName, {});
       }
-      updateData.role_id = newRole.Id;
+      updateData.role_id = newRole.id;
     }
 
     // Hash password if it's being updated

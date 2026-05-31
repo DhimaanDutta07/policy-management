@@ -170,27 +170,39 @@ function setupRoutes(app) {
 //     console.log(`✅ Created directory: ${uploadDir}`);
 //   }
 // }
+const app = (0, express_1.default)();
+// Initial checks and synchronous setup
+try {
+    checkEnvironmentVariables();
+}
+catch (err) {
+    console.error("❌ Environment check failed:", err);
+    if (!process.env.VERCEL)
+        process.exit(1);
+}
+setupMiddleware(app);
+setupRoutes(app);
 async function startApp() {
     try {
         // ensureUploadDir();
-        // Initial checks and setup
-        checkEnvironmentVariables();
-        await establishDatabaseConnection();
-        // Seed data
-        await (0, seedData_1.default)();
-        const app = (0, express_1.default)();
-        // Setup middleware and routes
-        setupMiddleware(app);
-        setupRoutes(app);
+        if (!process.env.VERCEL) {
+            await establishDatabaseConnection();
+            // Seed data
+            await (0, seedData_1.default)();
+        }
         // Start server
-        const port = process.env.PORT || 3000;
-        app.listen(port, () => {
-            console.log(`🚀 Server is running in ${process.env.NODE_ENV} mode on port: http://localhost:${port}`);
-        });
+        if (!process.env.VERCEL) {
+            const port = process.env.PORT || 3000;
+            app.listen(port, () => {
+                console.log(`🚀 Server is running in ${process.env.NODE_ENV} mode on port: http://localhost:${port}`);
+            });
+        }
     }
     catch (err) {
         console.error("❌ Error starting app:", err);
-        process.exit(1);
+        if (!process.env.VERCEL) {
+            process.exit(1);
+        }
     }
 }
 // Graceful shutdown handling
@@ -212,4 +224,7 @@ function setupGracefulShutdown() {
 }
 // Start the application
 startApp();
-setupGracefulShutdown();
+if (!process.env.VERCEL) {
+    setupGracefulShutdown();
+}
+exports.default = app;

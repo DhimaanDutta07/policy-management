@@ -68,7 +68,7 @@ async function registerUser(userData) {
                 "CompanyFormField",
             ],
         }, // Set default permissions if not provided
-        role_id: adminRole.Id,
+        role_id: adminRole.id,
     });
     return user;
 }
@@ -134,7 +134,7 @@ async function createUser(userData, roleName) {
         email: email || null,
         phone,
         permissions: permissions || { app: [], web: [] }, // Set default permissions if not provided
-        role_id: role ? role.Id : null,
+        role_id: role ? role.id : null,
     });
     // Create UserSite entries for each site
     // if (site_ids && Array.isArray(site_ids)) {
@@ -200,7 +200,7 @@ async function updateUserService(userId, updateData, roleName) {
                 // Create the role if it doesn't exist
                 newRole = await (0, roleRepository_1.createRole)(roleName, {});
             }
-            updateData.role_id = newRole.Id;
+            updateData.role_id = newRole.id;
         }
         // Hash password if it's being updated
         if (updateData.password) {

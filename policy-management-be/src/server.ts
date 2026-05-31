@@ -211,34 +211,43 @@ function setupRoutes(app: Express): void {
 //   }
 // }
 
+const app: Express = express();
+
+// Initial checks and synchronous setup
+try {
+  checkEnvironmentVariables();
+} catch (err) {
+  console.error("❌ Environment check failed:", err);
+  if (!process.env.VERCEL) process.exit(1);
+}
+
+setupMiddleware(app);
+setupRoutes(app);
+
 async function startApp(): Promise<void> {
   try {
-
     // ensureUploadDir();
 
-    // Initial checks and setup
-    checkEnvironmentVariables();
-    await establishDatabaseConnection();
-
-    // Seed data
-    await seedData();
-
-    const app: Express = express();
-
-    // Setup middleware and routes
-    setupMiddleware(app);
-    setupRoutes(app);
+    if (!process.env.VERCEL) {
+      await establishDatabaseConnection();
+      // Seed data
+      await seedData();
+    }
 
     // Start server
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-      console.log(
-        `🚀 Server is running in ${process.env.NODE_ENV} mode on port: http://localhost:${port}`
-      );
-    });
+    if (!process.env.VERCEL) {
+      const port = process.env.PORT || 3000;
+      app.listen(port, () => {
+        console.log(
+          `🚀 Server is running in ${process.env.NODE_ENV} mode on port: http://localhost:${port}`
+        );
+      });
+    }
   } catch (err) {
     console.error("❌ Error starting app:", err);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 }
 
@@ -262,4 +271,8 @@ function setupGracefulShutdown(): void {
 
 // Start the application
 startApp();
-setupGracefulShutdown();
+if (!process.env.VERCEL) {
+  setupGracefulShutdown();
+}
+
+export default app;

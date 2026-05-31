@@ -11,14 +11,14 @@ async function cleanupRoleData() {
         const roles = await prismaClient_1.default.role.findMany();
         for (const role of roles) {
             const originalName = role.role_name;
-            const originalId = role.Id;
+            const originalId = role.id;
             const trimmedName = role.role_name.trim();
-            const trimmedId = role.Id.trim();
+            const trimmedId = role.id.trim();
             // Update if name has whitespace
             if (originalName !== trimmedName) {
                 console.log(`Updating role ${originalId}: role_name "${originalName}" -> "${trimmedName}"`);
                 await prismaClient_1.default.role.update({
-                    where: { Id: originalId },
+                    where: { id: originalId },
                     data: { role_name: trimmedName }
                 });
             }

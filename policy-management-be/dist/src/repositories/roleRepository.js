@@ -25,7 +25,7 @@ async function findRoleByName(roleName) {
 async function findRoleById(id) {
     try {
         return await prismaClient_1.default.role.findUnique({
-            where: { Id: id }
+            where: { id }
         });
     }
     catch (err) {

@@ -15,7 +15,7 @@ export async function findRoleByName(roleName: string) {
 export async function findRoleById(id: string) {
   try {
     return await prisma.role.findUnique({
-      where: { Id: id }
+      where: { id }
     });
   } catch (err) {
     throw new AppError(500, 'ServerError', 'Error finding role by ID', err);
