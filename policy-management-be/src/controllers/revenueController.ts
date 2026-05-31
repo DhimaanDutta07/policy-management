@@ -11,8 +11,8 @@ import {
 
 export const getRevenuesByTimePeriod = async (req: Request, res: Response) => {
   try {
-    const siteId = req.params.siteId === "all" ? null : req.params.siteId;
-    const period = req.params.timePeriod;
+    const siteId = req.params.siteId as string === "all" ? null : req.params.siteId as string;
+    const period = req.params.timePeriod as string;
     const revenues = await findRevenuesByTimePeriod(siteId, period);
     res.status(200).json(revenues);
   } catch (error) {
@@ -35,7 +35,7 @@ export const getAllRevenues = async (req: Request, res: Response) => {
 
 export const getRevenue = async (req: Request, res: Response) => {
   try {
-    const revenue = await getRevenueById(req.params.id);
+    const revenue = await getRevenueById(req.params.id as string);
     if (!revenue) {
       res.status(404).json({ error: "Revenue not found" });
       return;
