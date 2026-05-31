@@ -1,14 +1,27 @@
-﻿import { Request, Response } from 'express';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default async function handler(req: Request, res: Response) {
+let app: any;
+
+async function getApp() {
+  if (!app) {
+    const server = await import("../src/server");
+    app = server.default;
+  }
+  return app;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const server = await import('../src/server');
-    const app = server.default;
-    return app(req, res);
+    const expressApp = await getApp();
+    return new Promise<void>((resolve, reject) => {
+      expressApp(req, res);
+      res.once("finish", resolve);
+      res.once("error", reject);
+    });
   } catch (err: any) {
-    console.error('Initialization error:', err);
+    console.error("Initialization error:", err);
     res.status(500).json({
-      error: 'Initialization Error',
+      error: "Initialization Error",
       message: err.message,
       stack: err.stack,
     });

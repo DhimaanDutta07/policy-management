@@ -98,7 +98,7 @@ app.get('/api/files/material-receipts/images/:fileName', (req: Request, res: Res
   // Basic middleware
   const origin = process.env.FRONTEND_API || process.env.LOCALHOST_API;
   app.use(cors({ 
-    origin: ["*","https://insurewelladvisory.in","https://policy.mindrops.com", "http://localhost:5173","http://localhost:3001" , "http://192.168.1.15:3001"], // Allow this domain
+    origin: ["https://insurewelladvisory.in","https://policy.mindrops.com", "http://localhost:5173","http://localhost:3001" , "http://192.168.1.15:3001"], // Allow this domain
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], // Allow these HTTP methods
     allowedHeaders: ["Content-Type", "Authorization", "role"],
     credentials: true,
