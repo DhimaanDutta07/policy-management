@@ -111,6 +111,7 @@ export async function loginUser(phone: string, password: string) {
       email: user.email,
       role: user.role ? user.role.role_name.trim() : null,
       permissions: user.permissions,
+      user_id: user.id,
     },
     JWT_SECRET,
     { expiresIn }

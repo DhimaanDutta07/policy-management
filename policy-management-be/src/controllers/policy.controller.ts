@@ -678,13 +678,14 @@ export const policyController = {
         });
       }
       
-      if (existingPolicy.created_by !== userId) {
-        return res.status(403).json({ 
-          error: "Forbidden",
-          message: "You can only delete your own policies",
-          timestamp: new Date().toISOString()
-        });
-      }
+      // TODO: Temporarily commented out to allow any ADMIN/OPERATIONS user to delete policies
+      // if (existingPolicy.created_by !== userId) {
+      //   return res.status(403).json({ 
+      //     error: "Forbidden",
+      //     message: "You can only delete your own policies",
+      //     timestamp: new Date().toISOString()
+      //   });
+      // }
 
       await policyService.deletePolicy(req.params.id as string);
       res.status(200).json({

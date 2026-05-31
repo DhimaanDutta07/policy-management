@@ -99,7 +99,24 @@ const PolicyTransitionSheet: React.FC<PolicyTransitionSheetProps> = ({
     watch,
     clearErrors,
     formState: { errors }
-  } = useForm<ExtendedTransitionData>();
+  } = useForm<ExtendedTransitionData>({
+    defaultValues: {
+      policy_number: '',
+      customer_name: '',
+      company_id: '',
+      policy_name_id: '',
+      sum_insured: 0,
+      premium_amount: 0,
+      tenure_years: 0,
+      start_date: '',
+      end_date: '',
+      issued_date: '',
+      gst_status: false,
+      premium_amount_gst: undefined,
+      deductible_amount_status: false,
+      deductible_amount: undefined,
+    },
+  });
 
   const watchedValues = watch();
 

@@ -4,6 +4,54 @@ import { DocumentAccessService } from '../services/documentAccess.service';
 import { asyncTryCatch } from '../utils/asyncTryCatch';
 import { PolicyTransitionType } from '@prisma/client';
 
+// Validation helper for policy transition input
+function validatePolicyTransitionInput(data: Record<string, unknown>): { valid: boolean; errors: Record<string, string> } {
+  const errors: Record<string, string> = {};
+  const requiredStringFields = [
+    { key: "policy_number", label: "Policy number" },
+    { key: "customer_name", label: "Customer name" },
+    { key: "company_id", label: "Company" },
+    { key: "policy_name_id", label: "Product name" },
+  ];
+  const requiredDateFields = [
+    { key: "start_date", label: "Start date" },
+    { key: "end_date", label: "End date" },
+    { key: "issued_date", label: "Issued date" },
+  ];
+  const requiredNumericFields = [
+    { key: "sum_insured", label: "Sum insured" },
+    { key: "premium_amount", label: "Premium amount" },
+    { key: "tenure_years", label: "Tenure (years)" },
+  ];
+
+  for (const { key, label } of requiredStringFields) {
+    if (!data[key] || String(data[key]).trim() === "") {
+      errors[key] = label + " is required";
+    }
+  }
+  for (const { key, label } of requiredDateFields) {
+    if (!data[key] || String(data[key]).trim() === "") {
+      errors[key] = label + " is required";
+    } else if (isNaN(Date.parse(String(data[key])))) {
+      errors[key] = label + " is not a valid date";
+    }
+  }
+  for (const { key, label } of requiredNumericFields) {
+    const val = Number(data[key]);
+    if (isNaN(val)) {
+      errors[key] = label + " must be a valid number";
+    } else if (val <= 0) {
+      errors[key] = label + " must be greater than 0";
+    }
+  }
+  if (data["gst_status"] !== undefined && typeof data["gst_status"] !== "boolean") {
+    errors["gst_status"] = "GST status must be true or false";
+  }
+
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
+
 // Create policy renewal
 export const createPolicyRenewal = asyncTryCatch(async (req: Request, res: Response): Promise<void> => {
   const parentPolicyId = req.params.parentPolicyId as string;
