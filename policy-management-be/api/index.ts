@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { IncomingMessage, ServerResponse } from "http";
 
 let app: any;
 
@@ -10,7 +10,7 @@ async function getApp() {
   return app;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
     const expressApp = await getApp();
     return new Promise<void>((resolve, reject) => {
@@ -20,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (err: any) {
     console.error("Initialization error:", err);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Initialization Error",
       message: err.message,
       stack: err.stack,
