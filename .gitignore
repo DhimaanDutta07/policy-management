@@ -3,4 +3,4 @@ build/
 out/
 .vercel
 .env
-*.log
+*.logdist/
