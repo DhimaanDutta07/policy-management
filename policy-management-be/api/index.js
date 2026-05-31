@@ -2,7 +2,7 @@ let app;
 
 async function getApp() {
   if (!app) {
-    const server = require("../dist/src/server.js");
+    const server = require("../src/server.ts");
     app = server.default || server;
   }
   return app;
