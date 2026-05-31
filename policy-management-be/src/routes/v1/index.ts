@@ -47,25 +47,21 @@ import policyTransitionRoutes from '../policyTransition.routes';
 // import { createTruck, deleteTruck, getAllTrucksDetails, getTruckById, getTrucks, searchTrucks } from "../../controllers/truckController";
 // import { CreateTruckSchema } from "../../schemas/truckSchema";
 // Use consistent storage path with upload logic
-const uploadPath = process.env.STORAGE_DIR || path.join(process.cwd(), 'storage');
-// Ensure upload directory exists
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+const uploadPath = process.env.VERCEL ? "/tmp/uploads" : (process.env.STORAGE_DIR || path.join(process.cwd(), "storage"));
 
-// Ensure upload subdirectories exist
-const materialReceiptsImagesPath = path.join(uploadPath, 'material-receipts', 'images');
-if (!fs.existsSync(materialReceiptsImagesPath)) {
-  fs.mkdirSync(materialReceiptsImagesPath, { recursive: true });
-  console.log(`Created material receipts images directory: ${materialReceiptsImagesPath}`);
-}
-
-// Ensure policy documents directory exists
-const policyDocsPath = path.join(uploadPath, 'policy-documents');
-if (!fs.existsSync(policyDocsPath)) {
-  fs.mkdirSync(policyDocsPath, { recursive: true });
-  console.log(`Created policy documents directory: ${policyDocsPath}`);
-}
+try {
+  if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+  }
+  const materialReceiptsImagesPath = path.join(uploadPath, "material-receipts", "images");
+  if (!fs.existsSync(materialReceiptsImagesPath)) {
+    fs.mkdirSync(materialReceiptsImagesPath, { recursive: true });
+  }
+  const policyDocsPath = path.join(uploadPath, "policy-documents");
+  if (!fs.existsSync(policyDocsPath)) {
+    fs.mkdirSync(policyDocsPath, { recursive: true });
+  }
+} catch (err) {}
 
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {

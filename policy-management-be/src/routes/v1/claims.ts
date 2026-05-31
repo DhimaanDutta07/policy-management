@@ -6,14 +6,14 @@ import { ClaimController } from "../../controllers/claim.controller";
 import { restrictTo } from "../../middlewares/AuthMiddleware";
 
 // Use consistent storage path with upload logic
-const uploadPath = process.env.STORAGE_DIR || path.join(process.cwd(), 'storage');
+const uploadPath = process.env.VERCEL ? "/tmp/uploads" : (process.env.STORAGE_DIR || path.join(process.cwd(), "storage"));
 
-// Ensure claim documents directory exists
-const claimDocsPath = path.join(uploadPath, 'policy-documents');
-if (!fs.existsSync(claimDocsPath)) {
-  fs.mkdirSync(claimDocsPath, { recursive: true });
-  console.log(`Created claim documents directory: ${claimDocsPath}`);
-}
+try {
+  const claimDocsPath = path.join(uploadPath, "policy-documents");
+  if (!fs.existsSync(claimDocsPath)) {
+    fs.mkdirSync(claimDocsPath, { recursive: true });
+  }
+} catch (err) {}
 
 const router = express.Router();
 const claimController = new ClaimController();
