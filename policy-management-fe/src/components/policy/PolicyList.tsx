@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../ui/dialog";
 import { ClaimSheet } from "../claims/ClaimSheet";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -155,7 +155,6 @@ const PolicyList: React.FC<PolicyListProps> = ({
   loading: externalLoading, 
   onViewPolicy, 
   onEditPolicy, 
-  onDeletePolicy,
   onCreatePolicy 
 }) => {
   const navigate = useNavigate();
