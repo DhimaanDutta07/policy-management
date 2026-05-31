@@ -1,16 +1,14 @@
-import type { IncomingMessage, ServerResponse } from "http";
-
-let app: any;
+let app;
 
 async function getApp() {
   if (!app) {
-    const server = await import("../src/server");
+    const server = await import("../dist/server.js");
     app = server.default;
   }
   return app;
 }
 
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+module.exports = async function handler(req, res) {
   // Handle CORS preflight directly
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
@@ -25,17 +23,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   try {
     const expressApp = await getApp();
-    return new Promise<void>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       expressApp(req, res);
       res.once("finish", resolve);
       res.once("error", reject);
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Initialization error:", err);
-    (res as any).status(500).json({
+    res.status(500).json({
       error: "Initialization Error",
       message: err.message,
       stack: err.stack,
     });
   }
-}
+};
