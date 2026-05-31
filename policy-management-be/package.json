@@ -53,6 +53,7 @@
     "@types/express": "^5.0.6",
     "@types/uuid": "^10.0.0",
     "@types/xlsx": "^0.0.36",
+    "@vercel/node": "^5.8.8",
     "nodemon": "^3.1.9"
   }
 }
