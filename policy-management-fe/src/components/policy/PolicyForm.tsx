@@ -169,7 +169,6 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
     total_percentage: 0,
     rule_found: false,
   });
-  const [isCalculatingCommission, setIsCalculatingCommission] = useState(false);
 
   const {
     register,
@@ -350,7 +349,6 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
     const finalPremiumAmount = premiumAmount || 0;
     const finalSumInsured = sumInsured || 0;
 
-    setIsCalculatingCommission(true);
     try {
       // Ensure commission add-on is a number
       const commissionAddOnNumber =
@@ -387,7 +385,6 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
         rule_found: false,
       });
     } finally {
-      setIsCalculatingCommission(false);
     }
   }, [
     wPremiumAmount,
