@@ -1339,7 +1339,16 @@ export const policyService = {
         where.start_date.lte = new Date(to);
       }
     }
-    // --- End date range filter ---
+
+    // --- Expiry-within filter: end_date between today and today+N days ---
+    const expiryWithin = Number(query.expiry_within);
+    if (expiryWithin > 0) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const expiryEnd = new Date(todayStart);
+      expiryEnd.setDate(expiryEnd.getDate() + expiryWithin);
+      where.end_date = { gte: todayStart, lte: expiryEnd };
+    }
 
     const skip = (Number(page) - 1) * Number(limit);
     const take = Number(limit);

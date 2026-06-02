@@ -110,6 +110,8 @@ export interface Policy {
   policyGroup?: string | { name: string };
   documents?: UploadedDocument[];
   reminders?: Reminder[];
+  chain_depth?: number;
+  chain_history?: { policy_number: string; status: string; start_date: string }[];
 }
 
 export interface PolicyReceipt {

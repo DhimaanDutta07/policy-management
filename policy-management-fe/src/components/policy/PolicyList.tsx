@@ -119,6 +119,28 @@ const formatCurrency = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount);
 
+type ExpiryBadge = { label: string; className: string } | null;
+
+const getExpiryBadge = (endDateStr: string): ExpiryBadge => {
+  if (!endDateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(endDateStr);
+  end.setHours(0, 0, 0, 0);
+  const days = Math.round((end.getTime() - today.getTime()) / 86_400_000);
+  if (days < 0)
+    return { label: `Expired ${Math.abs(days)}d ago`, className: "bg-red-100 text-red-700 border-red-200" };
+  if (days === 0)
+    return { label: "Expires today", className: "bg-red-100 text-red-700 border-red-200" };
+  if (days <= 7)
+    return { label: `In ${days}d`, className: "bg-red-100 text-red-700 border-red-200" };
+  if (days <= 30)
+    return { label: `In ${days}d`, className: "bg-orange-100 text-orange-700 border-orange-200" };
+  if (days <= 60)
+    return { label: `In ${days}d`, className: "bg-yellow-100 text-yellow-700 border-yellow-200" };
+  return null;
+};
+
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const variants: Record<string, string> = {
     Fresh: "bg-green-100 text-green-800 border-green-200",
@@ -142,6 +164,14 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
       {getDisplayName(status)}
     </span>
   );
+};
+
+const getChainLabel = (depth: number): string => {
+  if (depth <= 0) return '';
+  if (depth === 1) return '1st renewal';
+  if (depth === 2) return '2nd renewal';
+  if (depth === 3) return '3rd renewal';
+  return `${depth}th renewal`;
 };
 
 interface PolicyListProps {
@@ -213,6 +243,9 @@ const PolicyList: React.FC<PolicyListProps> = ({
   const [customDateRange, setCustomDateRange] = useState<{ from: Date | null, to: Date | null }>({ from: null, to: null });
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
+  // Expiry quick-filter: "all" | "7" | "30" | "60"
+  const [expiryFilter, setExpiryFilter] = useState<string>("all");
+
   // Debounce search input
   useEffect(() => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -268,7 +301,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
   useEffect(() => {
     fetchPolicies();
     // eslint-disable-next-line
-  }, [debouncedSearch, policyGroupFilter, statusFilter, showDeleted, dateFilter, customDateRange, currentPage, policiesPerPage]);
+  }, [debouncedSearch, policyGroupFilter, statusFilter, showDeleted, dateFilter, customDateRange, expiryFilter, currentPage, policiesPerPage]);
 
   // Fetch policy history for a specific policy
   const fetchPolicyHistory = useCallback(async (policyId: string) => {
@@ -316,6 +349,8 @@ const PolicyList: React.FC<PolicyListProps> = ({
       const { from, to } = getDateRange();
       if (from) params.from = from.toISOString();
       if (to) params.to = to.toISOString();
+      // Expiry quick-filter
+      if (expiryFilter !== "all") params.expiry_within = expiryFilter;
       
       const token = localStorage.getItem("authToken");
       const headers = { Authorization: `Bearer ${token}` };
@@ -922,6 +957,27 @@ const PolicyList: React.FC<PolicyListProps> = ({
                 <SelectItem value="Portablity">Portablity</SelectItem>
               </SelectContent>
             </Select>
+            {/* Expiring Soon quick-filter buttons */}
+            <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-md px-1.5 py-1">
+              <span className="text-[10px] font-medium text-gray-400 mr-0.5 whitespace-nowrap">Expiring</span>
+              {(["7", "30", "60"] as const).map((days) => (
+                <button
+                  key={days}
+                  onClick={() => { setExpiryFilter(expiryFilter === days ? "all" : days); setCurrentPage(1); }}
+                  className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors whitespace-nowrap ${
+                    expiryFilter === days
+                      ? days === "7"
+                        ? "bg-red-500 text-white"
+                        : days === "30"
+                        ? "bg-orange-500 text-white"
+                        : "bg-yellow-400 text-yellow-900"
+                      : "text-gray-500 hover:bg-gray-200"
+                  }`}
+                >
+                  {days}d
+                </button>
+              ))}
+            </div>
             {/* Date Filter Dropdown */}
             <div className={`w-full relative transition-all duration-200 ${dateFilter === "custom" && customDateRange.from && customDateRange.to ? 'sm:w-[160px]' : 'sm:w-[110px]'}`}>
               {dateFilter === "custom" ? (
@@ -991,7 +1047,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
                 </Select>
               )}
 </div>
-            {(searchTerm || policyGroupFilter !== "all" || statusFilter !== "all" || dateFilter !== "all" || (customDateRange.from && customDateRange.to)) && (
+            {(searchTerm || policyGroupFilter !== "all" || statusFilter !== "all" || dateFilter !== "all" || (customDateRange.from && customDateRange.to) || expiryFilter !== "all") && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1004,6 +1060,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
                         setDateFilter("all");
                         setCustomDateRange({ from: null, to: null });
                         setShowCustomDatePicker(false);
+                        setExpiryFilter("all");
                         setCurrentPage(1);
                       }}
                       className="bg-white border border-gray-200 hover:bg-gray-100"
@@ -1251,12 +1308,54 @@ const PolicyList: React.FC<PolicyListProps> = ({
                             <p className="text-xs text-gray-500">
                               to {formatDate(policy.end_date)}
                             </p>
+                            {(() => {
+                              const badge = getExpiryBadge(policy.end_date);
+                              return badge ? (
+                                <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full border ${badge.className}`}>
+                                  {badge.label}
+                                </span>
+                              ) : null;
+                            })()}
                           </div>
                         </TableCell>
 
                         {/* Status */}
                         <TableCell className="h-14 px-3 align-middle text-center">
-                          <StatusBadge status={policy.policy_creation_status || "Fresh"} />
+                          <div className="flex flex-col items-center gap-1">
+                            <StatusBadge status={policy.policy_creation_status || "Fresh"} />
+                            {policy.chain_depth != null && policy.chain_depth > 0 && (
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap cursor-default">
+                                      {getChainLabel(policy.chain_depth)}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="left" className="max-w-xs p-2 text-xs space-y-1 bg-white border border-gray-200 shadow-lg rounded-md text-gray-800">
+                                    <p className="font-semibold text-gray-600 mb-1">Policy chain</p>
+                                    {(policy.chain_history ?? []).map((entry, i) => (
+                                      <div key={i} className="flex items-center gap-1.5">
+                                        <span className="font-mono text-gray-700">{entry.policy_number}</span>
+                                        <span className="text-gray-400">·</span>
+                                        <span className="text-gray-500">{entry.status === 'Migration' ? 'Internal Portability' : entry.status}</span>
+                                        {entry.start_date && (
+                                          <>
+                                            <span className="text-gray-400">·</span>
+                                            <span className="text-gray-400">{entry.start_date.slice(0, 10)}</span>
+                                          </>
+                                        )}
+                                      </div>
+                                    ))}
+                                    <div className="flex items-center gap-1.5 border-t border-gray-100 pt-1 mt-1">
+                                      <span className="font-mono text-blue-600 font-semibold">{policy.policy_number}</span>
+                                      <span className="text-gray-400">·</span>
+                                      <span className="text-blue-500">current</span>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                         </TableCell>
 
                         {/* Actions - Three Dot Menu */}
