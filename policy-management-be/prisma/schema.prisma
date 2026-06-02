@@ -558,6 +558,35 @@ model Reminder {
   @@map("reminders")
 }
 
+model CommissionMaster {
+  id                    String   @id @default(uuid())
+  category              String   @db.VarChar(255)
+  sub_category          String   @db.VarChar(255)
+  commission_percentage Decimal  @db.Decimal(5, 2)
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  @@unique([category, sub_category])
+  @@index([category])
+  @@map("commission_master")
+}
+
+model PolicyTransaction {
+  id                    String   @id @default(uuid())
+  policy_number         String   @db.VarChar(255)
+  customer_name         String   @db.VarChar(255)
+  category              String   @db.VarChar(255)
+  sub_category          String   @db.VarChar(255)
+  premium_amount        Decimal  @db.Decimal(12, 2)
+  commission_percentage Decimal  @db.Decimal(5, 2)
+  commission_amount     Decimal  @db.Decimal(12, 2)
+  created_at            DateTime @default(now())
+
+  @@index([category, sub_category])
+  @@map("policy_transactions")
+}
+
 model CommissionRule {
   id                String               @id @default(uuid())
   policy_name_id    String
