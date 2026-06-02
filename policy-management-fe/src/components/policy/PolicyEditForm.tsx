@@ -716,25 +716,12 @@ export default function PolicyEditForm({ policyId, onSubmit, onClose }: PolicyEd
   const calculateCommission = useCallback(async () => {
     const premiumAmount = wPremiumAmount;
     const policyNameId = wPolicyNameId;
-    const proposerDob = wProposerDob;
     const sumInsured = wSumInsured;
     const deductibleStatus = wDeductibleStatus;
     const policyCreationStatus = wPolicyCreationStatus || "Fresh";
-    const commissionAddOn = wCommissionAddOn;
-
-    console.log('🔍 [Commission Debug] Input values:', {
-      premiumAmount,
-      policyNameId,
-      proposerDob,
-      sumInsured,
-      deductibleStatus,
-      policyCreationStatus,
-      commissionAddOn,
-      commissionAddOnType: typeof commissionAddOn
-    });
 
     // Only calculate if we have the minimum required fields
-    if (!premiumAmount || !policyNameId || !proposerDob || !sumInsured) {
+    if (!premiumAmount || !policyNameId || !sumInsured) {
       setCalculatedCommission({
         calculated_commission_amount: 0,
         base_percentage: 0,
@@ -747,24 +734,16 @@ export default function PolicyEditForm({ policyId, onSubmit, onClose }: PolicyEd
 
     setIsCalculatingCommission(true);
     try {
-      // Ensure commission add-on is a number
-      const commissionAddOnNumber = typeof commissionAddOn === 'number' ? commissionAddOn : 
-                                   typeof commissionAddOn === 'string' ? parseFloat(commissionAddOn) || 0 : 0;
-
-      console.log('🔍 [Commission Debug] Processed commission add-on:', commissionAddOnNumber);
-
       const result = await commissionCalculationService.calculateCommission({
         policy_name_id: policyNameId,
         policy_creation_status: policyCreationStatus,
-        proposer_dob: proposerDob,
         sum_insured: sumInsured,
         deductible_amount_status: deductibleStatus || false,
-        premium_amount: premiumAmount, // Use GST-exclusive amount (same as PolicyForm)
-        commission_add_on_percentage: commissionAddOnNumber,
+        premium_amount: premiumAmount,
       });
       
       console.log('🔍 [Commission Debug] Result:', result);
-      setCalculatedCommission(result);
+      setCalculatedCommission({ ...result, add_on_percentage: 0 });
     } catch (error) {
       console.error('Error calculating commission:', error);
       setCalculatedCommission({
@@ -777,7 +756,7 @@ export default function PolicyEditForm({ policyId, onSubmit, onClose }: PolicyEd
     } finally {
       setIsCalculatingCommission(false);
     }
-  }, [wPremiumAmount, wPolicyNameId, wProposerDob, wSumInsured, wDeductibleStatus, wPolicyCreationStatus, wCommissionAddOn]);
+  }, [wPremiumAmount, wPolicyNameId, wSumInsured, wDeductibleStatus, wPolicyCreationStatus]);
 
   // Calculate commission when relevant fields change
   useEffect(() => {
@@ -794,7 +773,6 @@ export default function PolicyEditForm({ policyId, onSubmit, onClose }: PolicyEd
     wSumInsured,
     wDeductibleStatus,
     wPolicyCreationStatus,
-    wCommissionAddOn,
   ]);
 
   const onFormSubmit = async (data: PolicyFormData) => {
