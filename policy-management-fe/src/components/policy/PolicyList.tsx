@@ -22,6 +22,7 @@ import PolicyHistorySheet from "./PolicyHistorySheet";
 // import { format } from "date-fns";
 // import { PolicyGroup } from "../../types";
 import type { PolicyGroup } from '../../types/index';
+import { useAuth } from "../../Context/AuthContext";
 
 // Custom hook for drag and drop
 const useDragAndDrop = (onFileSelect: (file: File) => void) => {
@@ -158,6 +159,9 @@ const PolicyList: React.FC<PolicyListProps> = ({
   onCreatePolicy 
 }) => {
   const navigate = useNavigate();
+  const { role } = useAuth();
+  // Commission visibility and policy deletion are restricted to admins.
+  const isAdmin = role?.role_name?.toUpperCase() === "ADMIN";
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [loading, setLoading] = useState(true);
   const isLoading = externalLoading !== undefined ? externalLoading : loading;
@@ -606,7 +610,8 @@ const PolicyList: React.FC<PolicyListProps> = ({
           "Start Date": formatDateForExport(policy.start_date),
           "End Date": formatDateForExport(policy.end_date),
           "Premium Amount": policy.premium_amount,
-          "Commission Amount": policy.calculated_commission_amount || 0,
+          // Commission is admin-only.
+          ...(isAdmin ? { "Commission Amount": policy.calculated_commission_amount || 0 } : {}),
           "Policy Status": policy.policy_creation_status === 'Migration' ? 'Internal Portability' : (policy.policy_creation_status || "Fresh"),
           "Sum Insured": policy.sum_insured || 0,
           "Tenure Years": policy.tenure_years || 0,
@@ -630,7 +635,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
           { wch: 12 }, // Start Date
           { wch: 12 }, // End Date
           { wch: 15 }, // Premium Amount
-          { wch: 15 }, // Commission Amount
+          ...(isAdmin ? [{ wch: 15 }] : []), // Commission Amount
           { wch: 12 }, // Policy Status
           { wch: 12 }, // Sum Insured
           { wch: 10 }, // Tenure Years
@@ -1038,9 +1043,11 @@ const PolicyList: React.FC<PolicyListProps> = ({
                     <TableHead className="h-10 px-3 text-center font-semibold text-gray-700 text-xs w-[9%]">
                       Premium
                     </TableHead>
-                    <TableHead className="h-10 px-3 text-left font-semibold text-gray-700 text-xs w-[9%]">
-                      Commission
-                    </TableHead>
+                    {isAdmin && (
+                      <TableHead className="h-10 px-3 text-left font-semibold text-gray-700 text-xs w-[9%]">
+                        Commission
+                      </TableHead>
+                    )}
                     <TableHead className="h-10 px-3 text-left font-semibold text-gray-700 text-xs w-[8%]">
                       Period
                     </TableHead>
@@ -1055,7 +1062,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="h-32 text-center">
+                      <TableCell colSpan={isAdmin ? 9 : 8} className="h-32 text-center">
                         <div className="flex items-center justify-center">
                           <div className="text-gray-500 font-medium">Loading...</div>
                         </div>
@@ -1063,7 +1070,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
                     </TableRow>
                   ) : paginatedPolicies.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="h-32 text-center">
+                      <TableCell colSpan={isAdmin ? 9 : 8} className="h-32 text-center">
                         <div className="flex items-center justify-center">
                           <div className="text-gray-500 font-medium">No policies found.</div>
                         </div>
@@ -1226,12 +1233,14 @@ const PolicyList: React.FC<PolicyListProps> = ({
                             {formatCurrency(policy.premium_amount)}
                           </span>
                         </TableCell>
-                        {/* Commission */}
-                        <TableCell className="h-14 px-3 align-middle text-center">
-                          <span className="text-xs font-semibold text-green-700">
-                            {policy.calculated_commission_amount !== undefined && policy.calculated_commission_amount !== null ? formatCurrency(policy.calculated_commission_amount) : '-'}
-                          </span>
-                        </TableCell>
+                        {/* Commission (admins only) */}
+                        {isAdmin && (
+                          <TableCell className="h-14 px-3 align-middle text-center">
+                            <span className="text-xs font-semibold text-green-700">
+                              {policy.calculated_commission_amount !== undefined && policy.calculated_commission_amount !== null ? formatCurrency(policy.calculated_commission_amount) : '-'}
+                            </span>
+                          </TableCell>
+                        )}
 
                         {/* Period */}
                         <TableCell className="h-14 px-3 align-middle text-left">
@@ -1358,18 +1367,22 @@ const PolicyList: React.FC<PolicyListProps> = ({
                                   History
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator className="my-0 border-gray-200" />
-                                <DropdownMenuItem
-                                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenDropdownId(null);
-                                    handleDeleteClick(policy);
-                                  }}
-                                >
-                                  <Trash2 size={14} />
-                                  Delete Policy
-                                </DropdownMenuItem>
+                                {isAdmin && (
+                                  <>
+                                    <DropdownMenuSeparator className="my-0 border-gray-200" />
+                                    <DropdownMenuItem
+                                      className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenDropdownId(null);
+                                        handleDeleteClick(policy);
+                                      }}
+                                    >
+                                      <Trash2 size={14} />
+                                      Delete Policy
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
 
                               </DropdownMenuContent>
                             </DropdownMenu>

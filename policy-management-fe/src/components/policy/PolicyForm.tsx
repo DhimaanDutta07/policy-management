@@ -1659,36 +1659,6 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
             </>
           )}
 
-          {showCommissionAddOn && (
-            <div className="space-y-1">
-              <label className="block text-xs font-semibold text-gray-700">
-                Commission Add-on (%)
-              </label>
-              <Input
-                type="number"
-                step="0.01"
-                min={0}
-                max={100}
-                {...register("commission_add_on_percentage", {
-                  setValueAs: (value) => {
-                    if (!value || value === "") return undefined;
-                    const num = parseFloat(value);
-                    return isNaN(num) ? undefined : num;
-                  },
-                  min: {
-                    value: 0,
-                    message: "Minimum is 0%",
-                  },
-                  max: {
-                    value: 100,
-                    message: "Maximum is 100%",
-                  },
-                })}
-                className="h-9 text-sm"
-              />
-            </div>
-          )}
-
           {/* Calculated / Manual Commission Display */}
           <div className="space-y-1">
             <label className="block text-xs font-semibold text-gray-700">
