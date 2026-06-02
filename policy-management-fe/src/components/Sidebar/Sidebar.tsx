@@ -621,6 +621,13 @@ const Sidebar: React.FC<SidebarProps> = () => {
           path: "/admin/commission",
           permission: "Commission",
         },
+        {
+          id: "commission-master",
+          name: "Commission Master",
+          icon: <BadgeIndianRupeeIcon size={20} />,
+          path: "/admin/commission-master",
+          permission: "Commission",
+        },
     // {
     //   id: "master",
     //   name: "Master",

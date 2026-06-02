@@ -28,6 +28,8 @@ import { createPolicyReceipt, updatePolicyReceipt, getPolicyReceipt, getAllPolic
 import * as policyGroupController from '../../controllers/policyGroupController';
 import { policyTypeController } from '../../controllers/policyTypeController';
 import { commissionRuleController } from '../../controllers/commissionRuleController';
+import { commissionMasterController } from '../../controllers/commissionMasterController';
+import { policyTransactionController } from '../../controllers/policyTransactionController';
 import { importPoliciesBulkHandler } from '../../bulkImport/bulkImportController';
 import claimRoutes from './claims';
 import policyTransitionRoutes from '../policyTransition.routes';
@@ -459,6 +461,18 @@ router.patch('/commission-rules/:id', restrictTo(['ADMIN']), (req, res) => { com
 router.patch('/commission-rules/:id/status', restrictTo(['ADMIN']), commissionRuleController.updateCommissionRuleStatus);
 router.patch('/commission-rules/policy/:policyNameId/status', restrictTo(['ADMIN']), commissionRuleController.updateCommissionRulesStatusByPolicyName);
 router.delete('/commission-rules/:id', restrictTo(['ADMIN']), (req, res) => { commissionRuleController.deleteCommissionRule(req, res); });
+
+// Commission Master Routes
+router.get('/commission-master', restrictTo(['ADMIN', 'OPERATIONS']), (req, res) => { commissionMasterController.getAll(req, res); });
+router.post('/commission-master', restrictTo(['ADMIN']), (req, res) => { commissionMasterController.create(req, res); });
+router.get('/commission-master/:id', restrictTo(['ADMIN', 'OPERATIONS']), (req, res) => { commissionMasterController.getById(req, res); });
+router.patch('/commission-master/:id/status', restrictTo(['ADMIN']), (req, res) => { commissionMasterController.updateStatus(req, res); });
+router.patch('/commission-master/:id', restrictTo(['ADMIN']), (req, res) => { commissionMasterController.update(req, res); });
+
+// Policy Transaction Routes (commission auto-calculated on create)
+router.get('/policy-transactions', restrictTo(['ADMIN', 'OPERATIONS']), (req, res) => { policyTransactionController.getAll(req, res); });
+router.post('/policy-transactions', restrictTo(['ADMIN', 'OPERATIONS']), (req, res) => { policyTransactionController.create(req, res); });
+router.get('/policy-transactions/:id', restrictTo(['ADMIN', 'OPERATIONS']), (req, res) => { policyTransactionController.getById(req, res); });
 
 // Company Routes
 router.post('/companies', restrictTo(['ADMIN']), (req, res) => { companyController.createCompany(req, res); });

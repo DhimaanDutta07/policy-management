@@ -297,3 +297,24 @@ export interface CommissionRule {
   // Optionally, include related PolicyName for easier display
   policyName?: PolicyName;
 } 
+export interface CommissionMaster {
+  id: string;
+  category: string;
+  sub_category: string;
+  commission_percentage: string | number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PolicyTransaction {
+  id: string;
+  policy_number: string;
+  customer_name: string;
+  category: string;
+  sub_category: string;
+  premium_amount: string | number;
+  commission_percentage: string | number;
+  commission_amount: string | number;
+  created_at: string;
+}

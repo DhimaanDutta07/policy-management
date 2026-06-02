@@ -36,6 +36,7 @@ import PolicyNamePage from "../components/PolicyNamePage";
 import CompanyFormFieldPage from "../components/CompanyFormFieldPage";
 import AgentPage from "../components/AgentPage";
 import CommissionRuleTable from "../components/CommissionRule/CommissionRule";
+import CommissionMasterDashboard from "../components/CommissionMaster/CommissionMasterDashboard";
 import { PolicyViewPage } from "../pages/PolicyViewPage";
 import { PolicyEditPage } from "../pages/PolicyEditPage";
 import { PolicyCreatePage } from "../pages/PolicyCreatePage";
@@ -188,6 +189,14 @@ const {role, isLoading } = useAuth();
               element={
                 <ProtectedRoute requiredPermission="Commission">
                   <CommissionRuleTable />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/commission-master"
+              element={
+                <ProtectedRoute requiredPermission="Commission">
+                  <CommissionMasterDashboard />
                 </ProtectedRoute>
               }
             />
