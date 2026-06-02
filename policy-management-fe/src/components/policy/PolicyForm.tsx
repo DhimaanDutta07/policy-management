@@ -491,8 +491,8 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
       if (!filteredData.deductible_amount_status) {
         delete filteredData.deductible_amount;
       }
-      // Add calculated commission amount
-      if (calculatedCommission.rule_found) {
+      // Only use auto-calculated commission if user hasn't manually entered one
+      if (!filteredData.calculated_commission_amount && calculatedCommission.rule_found) {
         filteredData.calculated_commission_amount =
           calculatedCommission.calculated_commission_amount;
       }
@@ -1692,26 +1692,25 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ onSubmit, onClose }) => {
             </div>
           )}
 
-          {/* Calculated Commission Display */}
+          {/* Calculated / Manual Commission Display */}
           <div className="space-y-1">
             <label className="block text-xs font-semibold text-gray-700">
-              Calculated Commission Amount (₹)
+              Commission Amount (₹)
             </label>
-            <div className="relative">
-              <Input
-                type="number"
-                value={calculatedCommission.calculated_commission_amount.toFixed(
-                  2
-                )}
-                readOnly
-                className="h-9 text-sm bg-gray-50"
-              />
-              {isCalculatingCommission && (
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                </div>
-              )}
-            </div>
+            <Input
+              type="number"
+              step="0.01"
+              min={0}
+              {...register("calculated_commission_amount", {
+                setValueAs: (value) => {
+                  if (!value || value === "") return undefined;
+                  const num = parseFloat(value);
+                  return isNaN(num) ? undefined : num;
+                },
+                min: { value: 0, message: "Minimum is 0" },
+              })}
+              className="h-9 text-sm"
+            />
             {/* {calculatedCommission.rule_found && (
     <div className="text-xs text-gray-600 mt-1 space-y-1">
       <div>Base Commission: {calculatedCommission.base_percentage}%</div>

@@ -1450,9 +1450,11 @@ export const policyService = {
     // Defensive: Merge with existing policy for full context
     const mergedData = { ...existingPolicy, ...updateData };
 
-    // Always recalculate commission before updating
-    await calculateAndSetCommission(mergedData);
-    updateData.calculated_commission_amount = mergedData.calculated_commission_amount;
+    // Only recalculate commission if not manually provided in update
+    if (data.calculated_commission_amount === undefined) {
+      await calculateAndSetCommission(mergedData);
+      updateData.calculated_commission_amount = mergedData.calculated_commission_amount;
+    }
     if (typeof data.emi_amount !== 'undefined') {
       updateData.emi_amount = data.emi_amount;
     }

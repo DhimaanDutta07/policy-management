@@ -370,8 +370,10 @@ export const policyController = {
       // Pass files from Multer to the service
       const files = convertFilesToObject(req.files);
 
-      // 👉 Calculate commission before saving
-      await calculateAndSetCommission(dataWithDates);
+      // Calculate commission before saving (skip if user provided manual value)
+      if (!dataWithDates.calculated_commission_amount) {
+        await calculateAndSetCommission(dataWithDates);
+      }
 
       // NOTE: emi_amount and commission_add_on_percentage are passed through to service layer
       console.log('📋 [CREATE] Processing policy:', {
