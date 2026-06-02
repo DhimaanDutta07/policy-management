@@ -106,6 +106,23 @@ export const commissionCalculationService = {
       );
 
       if (!matchingRule) {
+        // Fallback: when no matching CommissionRule exists, use commission_add_on_percentage as standalone percentage
+        const addOnPercentage = params.commission_add_on_percentage || 0;
+        if (addOnPercentage > 0) {
+          const fallbackCommission = (params.premium_amount * addOnPercentage) / 100;
+          console.log('No matching rule, using add-on fallback:', {
+            addOnPercentage,
+            premiumAmount: params.premium_amount,
+            fallbackCommission,
+          });
+          return {
+            calculated_commission_amount: fallbackCommission,
+            base_percentage: 0,
+            add_on_percentage: addOnPercentage,
+            total_percentage: addOnPercentage,
+            rule_found: true, // Treat as found since we're using the add-on
+          };
+        }
         return {
           calculated_commission_amount: 0,
           base_percentage: 0,

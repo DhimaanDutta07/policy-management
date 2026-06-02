@@ -119,6 +119,10 @@ function convertDataTypes(data: any) {
       const parsed = Number(result.commission_add_on_percentage);
       result.commission_add_on_percentage = isNaN(parsed) ? undefined : parsed;
     }
+    if (typeof result.calculated_commission_amount === 'string' && result.calculated_commission_amount !== '') {
+      const parsed = Number(result.calculated_commission_amount);
+      result.calculated_commission_amount = isNaN(parsed) ? undefined : parsed;
+    }
     
     // Convert booleans
     if (typeof result.declaration_accepted === 'string') {
