@@ -85,6 +85,31 @@ const emptyMasterForm: MasterFormState = {
   is_active: true,
 };
 
+const COMMISSION_OPTIONS: { category: string; sub_categories: string[] }[] = [
+  { category: "Optima Secure", sub_categories: ["Fresh", "Portability - 25K Deductible (All SI)"] },
+  {
+    category: "Other Retail",
+    sub_categories: [
+      "Fresh - Less than 10 Lakhs",
+      "Fresh - Greater than or equal to 10 Lakhs",
+      "Portability - 25K Deductible (All SI)",
+      "Portability - Less than 10 Lakhs",
+    ],
+  },
+  {
+    category: "STU",
+    sub_categories: [
+      "Fresh - Greater than or equal to 10 Lakhs",
+      "Portability - Less than 10 Lakhs",
+    ],
+  },
+  { category: "PA (Fresh)", sub_categories: ["Greater than or equal to 10 Lakhs"] },
+  { category: "SME (Fresh)", sub_categories: ["Less than 10 Lakhs"] },
+  { category: "SME", sub_categories: ["Greater than or equal to 10 Lakhs"] },
+  { category: "Travel", sub_categories: ["All SI"] },
+  { category: "All", sub_categories: ["All SI"] },
+];
+
 const CommissionMasterDashboard: React.FC = () => {
   const [masters, setMasters] = useState<CommissionMaster[]>([]);
   const [loadingMasters, setLoadingMasters] = useState(false);
@@ -565,19 +590,40 @@ const CommissionMasterDashboard: React.FC = () => {
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label>Category</Label>
-              <Input
+              <Select
                 value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="e.g. Optima Secure - Fresh"
-              />
+                onValueChange={(v) => setForm({ ...form, category: v, sub_category: "" })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMMISSION_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.category} value={opt.category}>
+                      {opt.category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Sub-category</Label>
-              <Input
+              <Select
                 value={form.sub_category}
-                onChange={(e) => setForm({ ...form, sub_category: e.target.value })}
-                placeholder="e.g. All SI"
-              />
+                onValueChange={(v) => setForm({ ...form, sub_category: v })}
+                disabled={!form.category}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select sub-category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(COMMISSION_OPTIONS.find(o => o.category === form.category)?.sub_categories || []).map((sub) => (
+                    <SelectItem key={sub} value={sub}>
+                      {sub}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Commission %</Label>

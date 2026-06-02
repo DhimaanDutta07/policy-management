@@ -1,169 +1,143 @@
 import axios from 'axios';
 
-export interface CommissionRule {
+export interface CommissionMasterEntry {
   id: string;
-  policy_name_id: string;
-  policyStatus: 'Fresh' | 'Renewal' | 'Migration' | 'Portablity';
-  ageCondition: 'LESS_THAN_60' | 'GREATER_THAN_60';
-  deductibleType: 'DEDUCTABLE_ALL_SI' | 'LESS_THAN_10_LAKHS' | 'GREATER_EQUAL_10_LAKHS';
-  commissionPercent: number;
+  category: string;
+  sub_category: string;
+  commission_percentage: number;
   is_active: boolean;
 }
 
 export interface CommissionCalculationParams {
   policy_name_id: string;
+  policyName?: string;
   policy_creation_status: 'Fresh' | 'Renewal' | 'Migration' | 'Portablity';
-  proposer_dob: string;
   sum_insured: number;
   deductible_amount_status: boolean;
   premium_amount: number;
-  commission_add_on_percentage?: number;
+}
+
+function deriveCategory(policyName: string): string {
+  const name = policyName.toLowerCase();
+  if (name.includes('optima secure')) return 'Optima Secure';
+  if (name.includes('stu')) return 'STU';
+  if (name.includes('travel')) return 'Travel';
+  if (name.includes('pa')) return 'PA (Fresh)';
+  if (name.includes('sme')) {
+    return 'SME';
+  }
+  return 'Other Retail';
+}
+
+function deriveSubCategory(
+  category: string,
+  policyStatus: string,
+  sumInsured: number,
+  deductibleStatus: boolean
+): string[] {
+  const isPortability = policyStatus === 'Portablity';
+
+  if (category === 'Travel') return ['All SI'];
+  if (category === 'All') return ['All SI'];
+  if (category === 'PA (Fresh)') return ['Greater than or equal to 10 Lakhs'];
+  if (category === 'SME (Fresh)') return ['Less than 10 Lakhs'];
+  if (category === 'SME') return ['Greater than or equal to 10 Lakhs'];
+
+  if (category === 'Optima Secure') {
+    if (isPortability) return ['Portability - 25K Deductible (All SI)'];
+    return ['Fresh'];
+  }
+
+  if (isPortability) {
+    if (deductibleStatus) return ['Portability - 25K Deductible (All SI)', 'Portability - Less than 10 Lakhs'];
+    return ['Portability - Less than 10 Lakhs', 'Portability - 25K Deductible (All SI)'];
+  }
+
+  if (sumInsured >= 1000000) {
+    return ['Fresh - Greater than or equal to 10 Lakhs'];
+  }
+  return ['Fresh - Less than 10 Lakhs'];
 }
 
 export const commissionCalculationService = {
-  // Calculate age from date of birth
-  calculateAge(dob: string): number {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  },
-
-  // Determine age condition
-  getAgeCondition(age: number): 'LESS_THAN_60' | 'GREATER_THAN_60' {
-    return age < 60 ? 'LESS_THAN_60' : 'GREATER_THAN_60';
-  },
-
-  // Determine deductible type
-  getDeductibleType(sumInsured: number, deductibleStatus: boolean): 'DEDUCTABLE_ALL_SI' | 'LESS_THAN_10_LAKHS' | 'GREATER_EQUAL_10_LAKHS' {
-    if (deductibleStatus === true) {
-      return 'DEDUCTABLE_ALL_SI';
-    } else if (sumInsured < 1000000) {
-      return 'LESS_THAN_10_LAKHS';
-    } else {
-      return 'GREATER_EQUAL_10_LAKHS';
-    }
-  },
-
-  // Fetch commission rules for a policy name
-  async getCommissionRules(policyNameId: string): Promise<CommissionRule[]> {
+  async getCommissionMasterEntries(): Promise<CommissionMasterEntry[]> {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/v1/commission-rules/policy/${policyNameId}`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/commission-master`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           },
         }
       );
-      return response.data;
+      const data = response.data;
+      return Array.isArray(data) ? data : (data?.data || []);
     } catch (error) {
-      console.error('Error fetching commission rules:', error);
+      console.error('Error fetching commission master:', error);
       return [];
     }
   },
 
-  // Calculate commission amount
   async calculateCommission(params: CommissionCalculationParams): Promise<{
     calculated_commission_amount: number;
     base_percentage: number;
-    add_on_percentage: number;
     total_percentage: number;
     rule_found: boolean;
   }> {
     try {
-      // Validate required parameters
-      if (!params.policy_name_id || !params.proposer_dob || !params.sum_insured || params.premium_amount === undefined) {
-        return {
-          calculated_commission_amount: 0,
-          base_percentage: 0,
-          add_on_percentage: 0,
-          total_percentage: 0,
-          rule_found: false,
-        };
+      if (!params.premium_amount || params.premium_amount <= 0) {
+        return { calculated_commission_amount: 0, base_percentage: 0, total_percentage: 0, rule_found: false };
       }
 
-      // Calculate age and conditions
-      const age = this.calculateAge(params.proposer_dob);
-      const ageCondition = this.getAgeCondition(age);
-      const deductibleType = this.getDeductibleType(params.sum_insured, params.deductible_amount_status);
+      const entries = await this.getCommissionMasterEntries();
+      const activeEntries = entries.filter(e => e.is_active);
 
-      // Fetch commission rules
-      const rules = await this.getCommissionRules(params.policy_name_id);
-      
-      // Find matching rule
-      const matchingRule = rules.find(rule => 
-        rule.policyStatus === params.policy_creation_status &&
-        rule.ageCondition === ageCondition &&
-        rule.deductibleType === deductibleType &&
-        rule.is_active === true
+      if (activeEntries.length === 0) {
+        return { calculated_commission_amount: 0, base_percentage: 0, total_percentage: 0, rule_found: false };
+      }
+
+      const policyName = params.policyName || '';
+      const category = deriveCategory(policyName);
+      const subCategories = deriveSubCategory(
+        category,
+        params.policy_creation_status,
+        params.sum_insured,
+        params.deductible_amount_status
       );
 
-      if (!matchingRule) {
-        // Fallback: when no matching CommissionRule exists, use commission_add_on_percentage as standalone percentage
-        const addOnPercentage = params.commission_add_on_percentage || 0;
-        if (addOnPercentage > 0) {
-          const fallbackCommission = (params.premium_amount * addOnPercentage) / 100;
-          console.log('No matching rule, using add-on fallback:', {
-            addOnPercentage,
-            premiumAmount: params.premium_amount,
-            fallbackCommission,
-          });
-          return {
-            calculated_commission_amount: fallbackCommission,
-            base_percentage: 0,
-            add_on_percentage: addOnPercentage,
-            total_percentage: addOnPercentage,
-            rule_found: true, // Treat as found since we're using the add-on
-          };
-        }
-        return {
-          calculated_commission_amount: 0,
-          base_percentage: 0,
-          add_on_percentage: 0,
-          total_percentage: 0,
-          rule_found: false,
-        };
+      let match: CommissionMasterEntry | undefined;
+
+      for (const sub of subCategories) {
+        match = activeEntries.find(
+          e => e.category.toLowerCase() === category.toLowerCase() &&
+               e.sub_category.toLowerCase() === sub.toLowerCase()
+        );
+        if (match) break;
       }
 
-      // Calculate commission
-      const basePercentage = matchingRule.commissionPercent || 0;
-      const addOnPercentage = params.commission_add_on_percentage || 0;
-      const totalPercentage = basePercentage + addOnPercentage;
-      const calculatedCommission = (params.premium_amount * totalPercentage) / 100;
+      if (!match) {
+        match = activeEntries.find(
+          e => e.category.toLowerCase() === 'all' &&
+               e.sub_category.toLowerCase() === 'all si'
+        );
+      }
 
-      console.log('🔍 [Service Debug] Commission calculation:', {
-        basePercentage,
-        addOnPercentage,
-        totalPercentage,
-        premiumAmount: params.premium_amount,
-        calculatedCommission,
-        inputAddOn: params.commission_add_on_percentage
-      });
+      if (!match) {
+        return { calculated_commission_amount: 0, base_percentage: 0, total_percentage: 0, rule_found: false };
+      }
+
+      const percentage = Number(match.commission_percentage) || 0;
+      const commissionAmount = (params.premium_amount * percentage) / 100;
 
       return {
-        calculated_commission_amount: calculatedCommission,
-        base_percentage: basePercentage,
-        add_on_percentage: addOnPercentage,
-        total_percentage: totalPercentage,
+        calculated_commission_amount: commissionAmount,
+        base_percentage: percentage,
+        total_percentage: percentage,
         rule_found: true,
       };
     } catch (error) {
       console.error('Error calculating commission:', error);
-      return {
-        calculated_commission_amount: 0,
-        base_percentage: 0,
-        add_on_percentage: 0,
-        total_percentage: 0,
-        rule_found: false,
-      };
+      return { calculated_commission_amount: 0, base_percentage: 0, total_percentage: 0, rule_found: false };
     }
   },
-}; 
-
+};

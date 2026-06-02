@@ -157,10 +157,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         scheduleAbsoluteLogout(finalExp);
       }
       
-      // Fix: Use setTimeout instead of setInterval and navigate immediately
+      // Navigate to first permitted page based on user's web permissions
       setTimeout(() => {
-        navigate('/admin/users');
-      }, 1000);
+        const webPerms: string[] = (user?.permissions as any)?.web || [];
+        const ROUTE_PRIORITY = [
+          { perm: 'Dashboard', path: '/admin/policydashboard' },
+          { perm: 'All_Policy', path: '/admin/all-policies' },
+          { perm: 'Users_Panel', path: '/admin/users' },
+          { perm: 'Commission', path: '/admin/commission-master' },
+          { perm: 'Agent', path: '/admin/agents' },
+          { perm: 'Company', path: '/admin/companies' },
+          { perm: 'PolicyGroup', path: '/admin/policy-groups' },
+          { perm: 'PolicyType', path: '/admin/policy-types' },
+          { perm: 'PolicyName', path: '/admin/policy-names' },
+          { perm: 'Revenues', path: '/admin/revenues' },
+        ];
+        const found = ROUTE_PRIORITY.find(r => webPerms.includes(r.perm));
+        navigate(found ? found.path : '/admin/users');
+      }, 100);
 
     } catch (error) {
       console.error('Login error:', error);

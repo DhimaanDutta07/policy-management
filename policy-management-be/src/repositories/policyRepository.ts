@@ -777,21 +777,85 @@ export const policyRepository = {
     if (where.type && typeof where.type === 'string') {
       where.type = { name: where.type };
     }
-    // Remove old status/date-based logic
-    // Filtering by policy_creation_status is handled by the where object
+    // Only show leaf policies (latest in each chain): exclude policies that have
+    // been superseded by a renewal, portability, or migration child.
+    // History is still accessible via the History button on the new policy.
+    const leafWhere: Prisma.PolicyWhereInput = {
+      ...where,
+      children_policies: { none: {} },
+    };
     const [data, total] = await Promise.all([
       prisma.policy.findMany({
-        where,
+        where: leafWhere,
         orderBy: { created_at: 'desc' },
         skip,
         take,
         include: POLICY_FULL_INCLUDE,
       }),
-      prisma.policy.count({ where }),
+      prisma.policy.count({ where: leafWhere }),
     ]);
-    
+
+    // Compute chain depth + ancestor history for each policy via a single recursive CTE.
+    // chain_depth 0 = original policy, 1 = first renewal/portability, etc.
+    // chain_history is ordered oldest-first so the tooltip reads chronologically.
+    type ChainRow = {
+      id: string;
+      chain_depth: number;
+      chain_history: { policy_number: string; status: string; start_date: string }[];
+    };
+    let chainMap: Record<string, ChainRow> = {};
+    if (data.length > 0) {
+      const ids = data.map((p) => p.id);
+      const rows = await prisma.$queryRaw<ChainRow[]>`
+        WITH RECURSIVE chain AS (
+          SELECT
+            id               AS leaf_id,
+            parent_policy_id,
+            0                AS depth,
+            NULL::text       AS anc_number,
+            NULL::text       AS anc_status,
+            NULL::text       AS anc_start
+          FROM "Policy"
+          WHERE id = ANY(${ids}::uuid[])
+          UNION ALL
+          SELECT
+            c.leaf_id,
+            p.parent_policy_id,
+            c.depth + 1,
+            p.policy_number,
+            p.policy_creation_status,
+            p.start_date::text
+          FROM chain c
+          JOIN "Policy" p ON p.id = c.parent_policy_id
+          WHERE c.parent_policy_id IS NOT NULL
+        )
+        SELECT
+          leaf_id::text AS id,
+          MAX(depth)::int AS chain_depth,
+          COALESCE(
+            json_agg(
+              json_build_object(
+                'policy_number', anc_number,
+                'status',        anc_status,
+                'start_date',    anc_start
+              ) ORDER BY depth DESC
+            ) FILTER (WHERE anc_number IS NOT NULL),
+            '[]'::json
+          ) AS chain_history
+        FROM chain
+        GROUP BY leaf_id
+      `;
+      chainMap = Object.fromEntries(rows.map((r) => [r.id, r]));
+    }
+
+    const enriched = data.map((p) => ({
+      ...p,
+      chain_depth:   chainMap[p.id]?.chain_depth   ?? 0,
+      chain_history: chainMap[p.id]?.chain_history ?? [],
+    }));
+
     return {
-      data,
+      data: enriched,
       total,
       page: Math.floor(skip / take) + 1,
       limit: take,
